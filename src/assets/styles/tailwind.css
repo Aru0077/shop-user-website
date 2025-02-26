@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* 自定义样式类 */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white py-2 px-4 rounded-lg font-medium;
+  }
+
+  .btn-outline {
+    @apply border border-primary text-primary py-2 px-4 rounded-lg font-medium;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-4;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md;
+  }
+}
