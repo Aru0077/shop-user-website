@@ -8,14 +8,17 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Banner: typeof import('./src/components/home/Banner.vue')['default']
     CustomTabBar: typeof import('./src/components/layout/CustomTabBar.vue')['default']
     NavBar: typeof import('./src/components/common/NavBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SearchBar: typeof import('./src/components/home/SearchBar.vue')['default']
     TabBar: typeof import('./src/components/layout/TabBar.vue')['default']
     VanButton: typeof import('vant/es')['Button']
     VanEmpty: typeof import('vant/es')['Empty']
     VanIcon: typeof import('vant/es')['Icon']
+    VanImage: typeof import('vant/es')['Image']
     VanTabbar: typeof import('vant/es')['Tabbar']
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
   }

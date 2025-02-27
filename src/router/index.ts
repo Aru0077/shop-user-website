@@ -28,13 +28,10 @@ const routes: Array<RouteRecordRaw> = [
                         name: 'Home',
                         component: () => import('@/views/home/Home.vue'),
                         meta: {
-                              title: 'Home',
+                              title: 'UniMall - Home',
                               keepAlive: true,
                               navBar: {
-                                    show: true,
-                                    title: '首页',
-                                    leftBtn: 'none',
-                                    rightBtn: 'none'
+                                    show: false,
                               }
                         },
                   },
@@ -43,13 +40,10 @@ const routes: Array<RouteRecordRaw> = [
                         name: 'Category',
                         component: () => import('@/views/category/Category.vue'),
                         meta: {
-                              title: 'Category',
+                              title: 'UniMall - Category',
                               keepAlive: true,
                               navBar: {
-                                    show: true,
-                                    title: 'Category',
-                                    leftBtn: 'none',
-                                    rightBtn: 'none'
+                                    show: false,
                               }
                         },
                   },
@@ -58,13 +52,10 @@ const routes: Array<RouteRecordRaw> = [
                         name: 'Cart',
                         component: () => import('@/views/cart/Cart.vue'),
                         meta: {
-                              title: 'Cart',
+                              title: 'UniMall - Cart',
                               keepAlive: true,
                               navBar: {
-                                    show: true,
-                                    title: '首页',
-                                    leftBtn: 'none',
-                                    rightBtn: 'none'
+                                    show: false,
                               }
                         },
                   },
@@ -73,13 +64,10 @@ const routes: Array<RouteRecordRaw> = [
                         name: 'User',
                         component: () => import('@/views/user/User.vue'),
                         meta: {
-                              title: 'User',
+                              title: 'UniMall - User',
                               keepAlive: true,
                               navBar: {
-                                    show: true,
-                                    title: '首页',
-                                    leftBtn: 'none',
-                                    rightBtn: 'none'
+                                    show: false,
                               }
                         },
                   },
@@ -91,27 +79,25 @@ const routes: Array<RouteRecordRaw> = [
             name: 'AddressList',
             component: () => import('@/views/address/AddressList.vue'),
             meta: {
-                  title: 'AddressList',
+                  title: 'UniMall - AddressList',
                   keepAlive: true,
                   navBar: {
-                        show: true,
-                        title: '首页',
-                        leftBtn: 'none',
+                        show: true, 
+                        leftBtn: 'back',
                         rightBtn: 'none'
                   }
             },
       },
       {
             path: '/address/add',
-            name: 'AddressAdd',
+            name: 'UniMall - AddressAdd',
             component: () => import('@/views/address/AddressAdd.vue'),
             meta: {
                   title: 'AddressAdd',
                   keepAlive: true,
                   navBar: {
-                        show: true,
-                        title: '首页',
-                        leftBtn: 'none',
+                        show: true, 
+                        leftBtn: 'back',
                         rightBtn: 'none'
                   }
             },
@@ -122,11 +108,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'DeleteAccount',
             component: () => import('@/views/auth/DeleteAccount.vue'),
             meta: {
-                  title: 'DeleteAccount',
+                  title: 'UniMall - DeleteAccount',
                   navBar: {
-                        show: true,
-                        title: '首页',
-                        leftBtn: 'none',
+                        show: true, 
+                        leftBtn: 'back',
                         rightBtn: 'none'
                   }
             },
@@ -136,11 +121,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'Login',
             component: () => import('@/views/auth/Login.vue'),
             meta: {
-                  title: 'Login',
+                  title: 'UniMall - Login',
                   navBar: {
-                        show: true,
-                        title: '首页',
-                        leftBtn: 'none',
+                        show: true, 
+                        leftBtn: 'back',
                         rightBtn: 'none'
                   }
             },
@@ -151,11 +135,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'Favorite',
             component: () => import('@/views/favorite/Favorite.vue'),
             meta: {
-                  title: 'Favorite',
+                  title: 'UniMall - Favorite',
                   navBar: {
-                        show: true,
-                        title: '首页',
-                        leftBtn: 'none',
+                        show: true, 
+                        leftBtn: 'back',
                         rightBtn: 'none'
                   }
             },
@@ -166,11 +149,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'privacy',
             component: () => import('@/views/legal/Privacy.vue'),
             meta: {
-                  title: 'privacy',
+                  title: 'UniMall - Privacy',
                   navBar: {
-                        show: true,
-                        title: '首页',
-                        leftBtn: 'none',
+                        show: true, 
+                        leftBtn: 'back',
                         rightBtn: 'none'
                   }
             },
@@ -180,10 +162,9 @@ const routes: Array<RouteRecordRaw> = [
             name: 'Terms',
             component: () => import('@/views/legal/Terms.vue'),
             meta: {
-                  title: '服务条款',
+                  title: 'UniMall - Terms',
                   navBar: {
-                        show: true,
-                        title: '服务条款',
+                        show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
                   }
@@ -195,11 +176,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'OrderList',
             component: () => import('@/views/order/OrderList.vue'),
             meta: {
-                  title: '我的订单',
+                  title: 'UniMall - Order',
                   auth: true,
                   navBar: {
-                        show: true,
-                        title: '我的订单',
+                        show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
                   }
@@ -210,11 +190,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'OrderDetail',
             component: () => import('@/views/order/OrderDetail.vue'),
             meta: {
-                  title: '订单详情',
+                  title: 'UniMall - OrderDetail',
                   auth: true,
                   navBar: {
-                        show: true,
-                        title: '订单详情',
+                        show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
                   }
@@ -226,11 +205,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'Payment',
             component: () => import('@/views/payment/Payment.vue'),
             meta: {
-                  title: '支付',
+                  title: 'UniMall - Payment',
                   auth: true,
                   navBar: {
-                        show: true,
-                        title: '支付',
+                        show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
                   }
@@ -242,11 +220,10 @@ const routes: Array<RouteRecordRaw> = [
             name: 'ProductList',
             component: () => import('@/views/product/ProductList.vue'),
             meta: {
-                  title: '商品列表',
+                  title: 'UniMall - ProductList',
                   keepAlive: true,
                   navBar: {
-                        show: true,
-                        title: '商品列表',
+                        show: true, 
                         leftBtn: 'back',
                         rightBtn: 'search'
                   }
@@ -257,10 +234,9 @@ const routes: Array<RouteRecordRaw> = [
             name: 'ProductDetail',
             component: () => import('@/views/product/ProductDetail.vue'),
             meta: {
-                  title: '商品详情',
+                  title: 'UniMall - ProductDetail',
                   navBar: {
-                        show: true,
-                        title: '商品详情',
+                        show: true, 
                         leftBtn: 'back',
                         rightBtn: 'share'
                   }

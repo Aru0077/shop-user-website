@@ -86,7 +86,7 @@ const tabItems = [
   left: 50%;
   width: 0;
   height: 0;
-  background-color: #333;
+  background-color: #000;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   transition: width 0.3s ease, height 0.3s ease;

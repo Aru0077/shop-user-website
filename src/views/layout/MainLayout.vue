@@ -65,7 +65,6 @@ export default defineComponent({
       display: flex;
       flex-direction: column;
       height: 100vh;
-      background-color: #f7f8fa;
 }
 
 .content-container {

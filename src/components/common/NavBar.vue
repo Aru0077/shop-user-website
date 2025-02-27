@@ -1,16 +1,20 @@
 <!-- src/components/common/NavBar.vue -->
 <template>
-      <div class="nav-bar" :class="{ 'with-background': showBackground }">
+      <div class="fixed top-0 left-0 right-0 flex items-center justify-between z-100 px-5 pt-5 pb-0 box-border"
+            :class="{ 'bg-white backdrop-blur-md': showBackground, 'bg-transparent': !showBackground }">
             <!-- 左侧按钮 -->
-            <div class="left-btn">
+            <div class="flex items-center">
                   <template v-if="leftBtn === 'back'">
-                        <van-icon name="arrow-left" size="20" @click="handleBack" />
+                        <ChevronLeft :size="20" @click="handleBack"
+                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="leftBtn === 'home'">
-                        <van-icon name="wap-home" size="20" @click="handleHome" />
+                        <Home :size="20" @click="handleHome"
+                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="leftBtn === 'close'">
-                        <van-icon name="cross" size="20" @click="handleClose" />
+                        <X :size="20" @click="handleClose"
+                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="leftBtn === 'custom'">
                         <slot name="left"></slot>
@@ -18,18 +22,22 @@
             </div>
 
             <!-- 标题 -->
-            <div class="title">{{ title }}</div>
+            <div class="text-lg font-medium text-center flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ title
+                  }}</div>
 
             <!-- 右侧按钮 -->
-            <div class="right-btn">
+            <div class="flex items-center">
                   <template v-if="rightBtn === 'more'">
-                        <van-icon name="ellipsis" size="20" @click="handleMore" />
+                        <MoreHorizontal :size="20" @click="handleMore"
+                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="rightBtn === 'search'">
-                        <van-icon name="search" size="20" @click="handleSearch" />
+                        <Search :size="20" @click="handleSearch"
+                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="rightBtn === 'share'">
-                        <van-icon name="share" size="20" @click="handleShare" />
+                        <Share2 :size="20" @click="handleShare"
+                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="rightBtn === 'custom'">
                         <slot name="right"></slot>
@@ -39,117 +47,71 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { Icon } from 'vant'
-import { useRouter } from 'vue-router'
-
-export default defineComponent({
-      name: 'NavBar',
-      components: {
-            'van-icon': Icon
-      },
-      props: {
-            title: {
-                  type: String,
-                  default: ''
-            },
-            leftBtn: {
-                  type: String,
-                  default: 'back' // 'back', 'home', 'close', 'custom', 'none'
-            },
-            rightBtn: {
-                  type: String,
-                  default: 'none' // 'more', 'search', 'share', 'custom', 'none'
-            },
-            showBackground: {
-                  type: Boolean,
-                  default: false
-            }
-      },
-      emits: ['left-click', 'right-click'],
-      setup(props, { emit }) {
-            const router = useRouter()
-
-            // 处理返回按钮点击
-            const handleBack = () => {
-                  emit('left-click')
-                  router.back()
-            }
-
-            // 处理首页按钮点击
-            const handleHome = () => {
-                  emit('left-click')
-                  router.push('/')
-            }
-
-            // 处理关闭按钮点击
-            const handleClose = () => {
-                  emit('left-click')
-                  router.back()
-            }
-
-            // 处理更多按钮点击
-            const handleMore = () => {
-                  emit('right-click')
-            }
-
-            // 处理搜索按钮点击
-            const handleSearch = () => {
-                  emit('right-click')
-            }
-
-            // 处理分享按钮点击
-            const handleShare = () => {
-                  emit('right-click')
-            }
-
-            return {
-                  handleBack,
-                  handleHome,
-                  handleClose,
-                  handleMore,
-                  handleSearch,
-                  handleShare
-            }
-      }
-})
+// 用于定义组件名称
+export default {
+      name: 'NavBar'
+}
 </script>
 
-<style scoped>
-.nav-bar {
-      position: fixed;
-      top: 44px;
-      left: 0;
-      right: 0;
-      height: 53px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 100;
-      padding: 0 25px;
-      box-sizing: border-box;
-      background-color: transparent;
+<script lang="ts" setup>
+import { Home, X, MoreHorizontal, Search, Share2, ChevronLeft } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+
+// 定义属性
+defineProps({
+      title: {
+            type: String,
+            default: ''
+      },
+      leftBtn: {
+            type: String,
+            default: 'back' // 'back', 'home', 'close', 'custom', 'none'
+      },
+      rightBtn: {
+            type: String,
+            default: 'none' // 'more', 'search', 'share', 'custom', 'none'
+      },
+      showBackground: {
+            type: Boolean,
+            default: false
+      }
+})
+
+// 定义事件
+const emit = defineEmits(['left-click', 'right-click'])
+
+const router = useRouter()
+
+// 处理返回按钮点击
+const handleBack = () => {
+      emit('left-click')
+      router.back()
 }
 
-.nav-bar.with-background {
-      background-color: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
+// 处理首页按钮点击
+const handleHome = () => {
+      emit('left-click')
+      router.push('/')
 }
 
-.title {
-      font-size: 18px;
-      font-weight: 500;
-      text-align: center;
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+// 处理关闭按钮点击
+const handleClose = () => {
+      emit('left-click')
+      router.back()
 }
 
-.left-btn,
-.right-btn {
-      min-width: 24px;
-      display: flex;
-      align-items: center;
+// 处理更多按钮点击
+const handleMore = () => {
+      emit('right-click')
 }
-</style>
+
+// 处理搜索按钮点击
+const handleSearch = () => {
+      emit('right-click')
+}
+
+// 处理分享按钮点击
+const handleShare = () => {
+      emit('right-click')
+}
+</script>
