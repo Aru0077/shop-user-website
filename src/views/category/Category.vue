@@ -3,3 +3,7 @@
           1  category
       </div>
 </template>
+
+<script lang="ts" setup>
+
+</script>
