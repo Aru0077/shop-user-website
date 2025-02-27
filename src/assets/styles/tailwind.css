@@ -1,4 +1,7 @@
-@import "tailwindcss";
+/* src/assets/styles/tailwind.css */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 /* 自定义样式类 */
 @layer components {

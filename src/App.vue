@@ -1,5 +1,9 @@
 <template>
   <div id="app" class="app-container">
+    <!-- 全局导航栏 -->
+    <nav-bar v-if="navBarConfig.show" :title="navBarConfig.title" :left-btn="navBarConfig.leftBtn"
+      :right-btn="navBarConfig.rightBtn" :show-background="navBarConfig.showBackground" />
+
     <router-view v-slot="{ Component }">
       <keep-alive>
         <component :is="Component" />
@@ -9,14 +13,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onBeforeUnmount } from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useWindowSize } from '@/hooks/useWindowSize'
+import NavBar from './components/common/NavBar.vue';
 
 export default defineComponent({
   name: 'App',
   setup() {
     // 监听窗口大小变化，用于响应式设计
     const { width } = useWindowSize()
+    const route = useRoute()
 
     // 监听网络状态变化
     const handleNetworkChange = () => {
@@ -27,6 +34,35 @@ export default defineComponent({
         // 网络恢复处理
         console.log('网络已连接')
       }
+    }
+
+
+    // 获取当前路由的导航栏配置
+    const navBarConfig = computed(() => {
+      const defaultConfig = {
+        show: false,
+        title: '',
+        leftBtn: 'back',
+        rightBtn: 'none',
+        showBackground: false
+      }
+
+      return {
+        ...defaultConfig,
+        ...(route.meta.navBar || {})
+      }
+    })
+
+    // 处理导航栏左侧按钮点击
+    const handleNavLeftClick = () => {
+      // 可以在这里添加额外的处理逻辑
+      console.log('左侧按钮点击')
+    }
+
+    // 处理导航栏右侧按钮点击
+    const handleNavRightClick = () => {
+      // 可以在这里添加额外的处理逻辑
+      console.log('右侧按钮点击')
     }
 
     onMounted(() => {
@@ -49,7 +85,8 @@ export default defineComponent({
     })
 
     return {
-      width
+      width,
+      navBarConfig
     }
   }
 })
@@ -60,7 +97,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  background-color: #f7f8fa;
+  background-color: rgba(255, 255, 255, 1);
 }
 
 /* 移动端样式 */

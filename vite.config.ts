@@ -3,7 +3,6 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import Components from 'unplugin-vue-components/vite'
 import { VantResolver } from 'unplugin-vue-components/resolvers'
-import { createStyleImportPlugin, VantResolve } from 'vite-plugin-style-import'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,17 +11,6 @@ export default defineConfig({
     // 自动导入组件
     Components({
       resolvers: [VantResolver()],
-    }),
-    // 按需导入样式
-    createStyleImportPlugin({
-      resolves: [VantResolve()],
-      libs: [
-        {
-          libraryName: 'vant',
-          esModule: true,
-          resolveStyle: (name) => `vant/es/${name}/style/index`,
-        },
-      ],
     }),
   ],
   resolve: {
