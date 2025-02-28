@@ -1,20 +1,20 @@
 <!-- src/components/common/NavBar.vue -->
 <template>
-      <div class="fixed top-0 left-0 right-0 flex items-center justify-between z-100 px-5 pt-5 pb-0 box-border"
+      <div class="fixed top-0 left-0 right-0 flex items-center justify-between z-1000 px-2 pt-2 pb-0 box-border"
             :class="{ 'bg-white backdrop-blur-md': showBackground, 'bg-transparent': !showBackground }">
             <!-- 左侧按钮 -->
             <div class="flex items-center">
                   <template v-if="leftBtn === 'back'">
                         <ChevronLeft :size="20" @click="handleBack"
-                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
+                              class="bg-black text-white p-1 rounded-full w-3 h-3 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="leftBtn === 'home'">
-                        <Home :size="20" @click="handleHome"
-                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
+                        <Home :size="10" @click="handleHome"
+                              class="bg-black text-white p-1 rounded-full w-3 h-3 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="leftBtn === 'close'">
                         <X :size="20" @click="handleClose"
-                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
+                              class="bg-black text-white p-1 rounded-full w-3 h-3 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="leftBtn === 'custom'">
                         <slot name="left"></slot>
@@ -29,15 +29,15 @@
             <div class="flex items-center">
                   <template v-if="rightBtn === 'more'">
                         <MoreHorizontal :size="20" @click="handleMore"
-                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
+                              class="bg-black text-white p-1 rounded-full w-3 h-3 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="rightBtn === 'search'">
                         <Search :size="20" @click="handleSearch"
-                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
+                              class="bg-black text-white p-1 rounded-full w-3 h-3 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="rightBtn === 'share'">
                         <Share2 :size="20" @click="handleShare"
-                              class="bg-black text-white p-2.5 rounded-full w-5 h-5 box-content cursor-pointer" />
+                              class="bg-black text-white p-1 rounded-full w-3 h-3 box-content cursor-pointer" />
                   </template>
                   <template v-else-if="rightBtn === 'custom'">
                         <slot name="right"></slot>

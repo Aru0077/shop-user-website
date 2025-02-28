@@ -1,6 +1,5 @@
 <template>
     <div class="pageContent">
-        <Home class="homeLogo" />
         <div class="px-[5px]">
             <div class="homeTitle">Welcome,</div>
             <div class="homeTitle2">Uni Mall Website</div>
@@ -16,17 +15,28 @@
         <div style="height: 30px;"></div>
 
         <!-- banner -->
-        <Banner imageUrl="https://img.js.design/assets/img/60f77156d961d24e3cf74934.png" title="30% Off" subtitle="On everything today"
-            description="Updated on 2025-2-3" @banner-click="handleBannerClick" @button-click="handleButtonClick" />
+        <Banner imageUrl="https://img.js.design/assets/img/60f77156d961d24e3cf74934.png" title="30% Off"
+            subtitle="On everything today" description="Updated on 2025-2-3" @banner-click="handleBannerClick"
+            @button-click="handleButtonClick" />
 
+            <!-- 占位容器 -->
+        <div style="height: 30px;"></div>
+
+        <!-- 商品宫格列表 -->
+        <ProductGrid :products="productList" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
+            @click-product="navigateToProductDetail" />
     </div>
 </template>
 
-<script lang="ts" setup>
-import { Home } from 'lucide-vue-next'
+<script lang="ts" setup> 
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import SearchBar from '@/components/home/SearchBar.vue';
 import Banner from '@/components/home/Banner.vue';
+import ProductGrid from '@/components/product/ProductGrid.vue';
+
+const router = useRouter()
+const hasMoreProducts = ref(true);
 
 // 搜索值
 const searchValue = ref('');
@@ -54,12 +64,59 @@ const handleButtonClick = () => {
     console.log('点击banner');
     // 清空搜索相关处理
 };
+
+// 商品数据示例
+const productList = ref([
+  {
+    id: 1,
+    brand: 'The Marc Jacobs',
+    title: 'Traveler Tote',
+    price: 195.00,
+    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf7493e.png'
+  },
+  {
+    id: 2,
+    brand: 'Axel Arigato',
+    title: 'Clean 90 Triple Sneakers',
+    price: 245.00,
+    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf74937.png'
+  },
+  {
+    id: 3,
+    brand: 'Axel Arigato',
+    title: 'Clean 90 Triple Sneakers',
+    price: 245.00,
+    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf7493e.png'
+  },
+  {
+    id: 4,
+    brand: 'Axel Arigato',
+    title: 'Clean 90 Triple Sneakers',
+    price: 245.00,
+    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf74937.png'
+  },
+  // 更多商品...
+]);
+
+// 加载更多商品函数
+const loadMoreProducts = () => {
+  // 实现加载更多商品的逻辑
+  // 例如调用API获取更多商品
+};
+
+// 点击商品跳转到详情页
+const navigateToProductDetail = (product) => {
+  router.push(`/product/detail/${product.id}`);
+};
+
+
 </script>
 
 <style scoped>
-.spacing{
+.spacing {
     height: 20px;
 }
+
 .homeLogo {
     color: #fff;
     background-color: #000;

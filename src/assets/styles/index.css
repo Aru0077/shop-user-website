@@ -16,6 +16,7 @@ body {
 }
 .pageContent{
   padding:20px 15px 0px 15px;
+  overflow-y: auto;
 }
 /* 修复底部安全区域 */
 .safe-area-bottom {

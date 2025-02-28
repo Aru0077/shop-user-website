@@ -11,6 +11,7 @@ declare module 'vue' {
     Banner: typeof import('./src/components/home/Banner.vue')['default']
     CustomTabBar: typeof import('./src/components/layout/CustomTabBar.vue')['default']
     NavBar: typeof import('./src/components/common/NavBar.vue')['default']
+    ProductGrid: typeof import('./src/components/product/ProductGrid.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./src/components/home/SearchBar.vue')['default']

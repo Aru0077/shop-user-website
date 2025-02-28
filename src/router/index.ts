@@ -31,7 +31,9 @@ const routes: Array<RouteRecordRaw> = [
                               title: 'UniMall - Home',
                               keepAlive: true,
                               navBar: {
-                                    show: false,
+                                    show: true,
+                                    leftBtn:'home',
+                                    showBackground:true
                               }
                         },
                   },
