@@ -15,7 +15,7 @@ body {
   font-size: 14px;
 }
 .pageContent{
-  padding:10px 15px 0px 15px;
+  padding:0px 15px 20px 15px;
 }
 /* 修复底部安全区域 */
 .safe-area-bottom {

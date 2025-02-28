@@ -1,5 +1,5 @@
 <template>
-      <div class="custom-tabbar">
+      <div class="custom-tabbar safe-area-bottom">
             <router-link v-for="item in tabItems" :key="item.path" :to="item.path" class="tabbar-item"
                   :class="{ active: route.path === item.path }">
                   <div class="icon-wrapper">
@@ -42,10 +42,6 @@ const tabItems = [
 
 <style scoped>
 .custom-tabbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
       height: 70px;
       border-radius: 30px 30px 0 0;
       background: rgba(255, 255, 255, 1);
@@ -53,8 +49,10 @@ const tabItems = [
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding-bottom: env(safe-area-inset-bottom);
+      width: 100%;
       z-index: 100;
+      position: relative; /* 添加相对定位，创建定位上下文 */
+      transform: translateZ(0); /* 创建层叠上下文 */
 }
 
 .tabbar-item {
@@ -70,44 +68,37 @@ const tabItems = [
 }
 
 .icon-wrapper {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s ease;
-  overflow: hidden;
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      z-index: 1; /* 确保图标在黑色背景上方 */
 }
+
 .icon-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background-color: #000;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s ease, height 0.3s ease;
-  z-index: -1;
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background-color: #000;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease;
+      z-index: -1;
 }
 
 .tabbar-item.active .icon-wrapper::after {
-  width: 100%;
-  height: 100%;
-}
-.tabbar-item.active .icon-wrapper {
-  border-radius: 50%;
+      width: 100%;
+      height: 100%;
 }
 
-/* 适配 PC 端 */
-/* @media (min-width: 768px) {
-      .custom-tabbar {
-            max-width: 768px;
-            margin: 0 auto;
-            left: 50%;
-            transform: translateX(-50%);
-      }
-} */
+.tabbar-item.active .icon-wrapper {
+      border-radius: 50%;
+}
 </style>

@@ -2,10 +2,10 @@
 <template>
       <div class="product-grid">
             <!-- 商品网格列表 -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-3">
                   <div v-for="(product, index) in products" :key="index" class="product-card">
                         <!-- 商品图片容器 -->
-                        <div class="relative overflow-hidden mb-2">
+                        <div class="relative overflow-hidden mb-0.5">
                               <img :src="product.imageUrl" :alt="product.title"
                                     class="w-full aspect-square object-cover rounded-md" />
                         </div>
@@ -16,14 +16,13 @@
                               <div class="text-[14px] font-semibold text-black mb-0.5">{{ product.brand }}</div>
 
                               <!-- 商品名称 -->
-                              <div class="text-[10px] text-gray-600 mb-1">{{ product.title }}</div>
+                              <!-- <div class="text-[10px] text-gray-600 mb-0.5">{{ product.title }}</div> -->
 
                               <!-- 商品价格 -->
                               <div class="text-[14px] font-bold">${{ product.price.toFixed(2) }}</div>
                         </div>
                   </div>
-            </div>
-
+            </div> 
       </div>
 </template>
 

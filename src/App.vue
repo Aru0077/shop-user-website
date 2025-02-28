@@ -3,7 +3,7 @@
   <div id="app" class="w-screen h-screen overflow-hidden flex flex-col">
     <!-- 顶部导航栏 - 固定高度 -->
     <div class="w-full z-20 flex-shrink-0">
-      <nav-bar v-if="navBarConfig.show" :title="navBarConfig.title" :left-btn="navBarConfig.leftBtn"
+      <nav-bar v-if="navBarConfig.show" :left-btn="navBarConfig.leftBtn"
         :right-btn="navBarConfig.rightBtn" :show-background="navBarConfig.showBackground" />
     </div>
 
@@ -22,8 +22,6 @@
     </div>
   </div>
 </template>
-
-
 
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, computed } from "vue";
@@ -51,7 +49,6 @@ const handleNetworkChange = () => {
 const navBarConfig = computed(() => {
   const defaultConfig = {
     show: false,
-    title: "",
     leftBtn: "back",
     rightBtn: "none",
     showBackground: false,
@@ -62,18 +59,6 @@ const navBarConfig = computed(() => {
     ...(route.meta.navBar || {}),
   };
 });
-
-// 处理导航栏左侧按钮点击
-const handleNavLeftClick = () => {
-  // 可以在这里添加额外的处理逻辑
-  console.log("左侧按钮点击");
-};
-
-// 处理导航栏右侧按钮点击
-const handleNavRightClick = () => {
-  // 可以在这里添加额外的处理逻辑
-  console.log("右侧按钮点击");
-};
 
 // 获取当前路由的TabBar显示状态
 const showTabBar = computed(() => {
@@ -105,20 +90,5 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-/* 移动端样式 */
-@media (max-width: 767px) {
-  .app-container {
-    max-width: 100vw;
-  }
-}
 
-/* PC端样式 */
-@media (min-width: 768px) {
-  .app-container {
-    max-width: 768px;
-    margin: 0 auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    height: 100vh;
-  }
-}
 </style>

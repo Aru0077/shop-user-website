@@ -31,7 +31,6 @@ const routes: Array<RouteRecordRaw> = [
                   navBar: {
                         show: true,
                         leftBtn:'home',
-                        showBackground:true
                   },
                   tabBar: {
                         show: true
