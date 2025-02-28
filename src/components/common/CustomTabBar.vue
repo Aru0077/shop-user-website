@@ -4,7 +4,7 @@
                   :class="{ active: route.path === item.path }">
                   <div class="icon-wrapper">
                         <component :is="item.icon" :size="24"
-                              :color="route.path === item.path ? '#ffffff' : '#333333'" />
+                              :color="route.path === item.path ? '#ffffff' : '#000'" />
                   </div>
             </router-link>
       </div>
@@ -64,7 +64,7 @@ const tabItems = [
       justify-content: center;
       width: 25%;
       height: 100%;
-      color: #333;
+      color: #000;
       text-decoration: none;
       position: relative;
 }

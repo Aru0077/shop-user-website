@@ -1,22 +1,36 @@
+<!--  App.vue -->
 <template>
-  <div id="app" class="app-container" :class="{ 'no-navbar': !navBarConfig.show }">
-    <!-- 全局导航栏 -->
-    <nav-bar v-if="navBarConfig.show" :title="navBarConfig.title" :left-btn="navBarConfig.leftBtn"
-      :right-btn="navBarConfig.rightBtn" :show-background="navBarConfig.showBackground" />
+  <div id="app" class="w-screen h-screen overflow-hidden flex flex-col">
+    <!-- 顶部导航栏 - 固定高度 -->
+    <div class="w-full z-20 flex-shrink-0">
+      <nav-bar v-if="navBarConfig.show" :title="navBarConfig.title" :left-btn="navBarConfig.leftBtn"
+        :right-btn="navBarConfig.rightBtn" :show-background="navBarConfig.showBackground" />
+    </div>
 
-    <router-view v-slot="{ Component }">
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
-    </router-view>
+    <!-- 中间内容区域 - 可滚动，占据剩余空间 -->
+    <div class="flex-1 overflow-auto relative">
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
+    </div>
+
+    <!-- 底部TabBar - 固定高度 -->
+    <div v-if="showTabBar" class="w-full flex-shrink-0 z-20">
+      <CustomTabBar />
+    </div>
   </div>
 </template>
+
+
 
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import NavBar from "./components/common/NavBar.vue";
+import CustomTabBar from "./components/common/CustomTabBar.vue";
 
 // 监听窗口大小变化，用于响应式设计
 const { width } = useWindowSize();
@@ -61,6 +75,11 @@ const handleNavRightClick = () => {
   console.log("右侧按钮点击");
 };
 
+// 获取当前路由的TabBar显示状态
+const showTabBar = computed(() => {
+  return route.meta.tabBar?.show ?? false;
+});
+
 onMounted(() => {
   // 添加网络状态监听
   window.addEventListener("online", handleNetworkChange);
@@ -86,16 +105,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-.app-container {
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  padding-top: 60px; 
-}
-.no-navbar {
-  padding-top: 0px;/* NavBar 不显示时的 padding */
-}
-
 /* 移动端样式 */
 @media (max-width: 767px) {
   .app-container {

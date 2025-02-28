@@ -8,72 +8,85 @@ declare module 'vue-router' {
             keepAlive?: boolean,
             navBar?: {
                   show?: boolean
-                  title?: string
                   leftBtn?: string
                   rightBtn?: string
                   showBackground?: boolean
+            },
+            tabBar?: {
+                  show?: boolean
             }
       }
 }
 
 // 路由配置
 const routes: Array<RouteRecordRaw> = [
+      // 主页路由
+      {
+            path: '/home',
+            name: 'Home',
+            component: () => import('@/views/home/Home.vue'),
+            meta: {
+                  title: 'UniMall - Home',
+                  keepAlive: true,
+                  navBar: {
+                        show: true,
+                        leftBtn:'home',
+                        showBackground:true
+                  },
+                  tabBar: {
+                        show: true
+                  }
+            },
+      },
+      {
+            path: '/category',
+            name: 'Category',
+            component: () => import('@/views/category/Category.vue'),
+            meta: {
+                  title: 'UniMall - Category',
+                  keepAlive: true,
+                  navBar: {
+                        show: false,
+                  },
+                  tabBar: {
+                        show: true
+                  }
+            },
+      },
+      {
+            path: '/cart',
+            name: 'Cart',
+            component: () => import('@/views/cart/Cart.vue'),
+            meta: {
+                  title: 'UniMall - Cart',
+                  keepAlive: true,
+                  navBar: {
+                        show: false,
+                  },
+                  tabBar: {
+                        show: true
+                  }
+            },
+      },
+      {
+            path: '/user',
+            name: 'User',
+            component: () => import('@/views/user/User.vue'),
+            meta: {
+                  title: 'UniMall - User',
+                  keepAlive: true,
+                  navBar: {
+                        show: false,
+                  },
+                  tabBar: {
+                        show: true
+                  }
+            },
+      },
+      // 添加根路径重定向
       {
             path: '/',
-            component: () => import('@/views/layout/MainLayout.vue'),
-            redirect: '/home',
-            children: [
-                  {
-                        path: '/home',
-                        name: 'Home',
-                        component: () => import('@/views/home/Home.vue'),
-                        meta: {
-                              title: 'UniMall - Home',
-                              keepAlive: true,
-                              navBar: {
-                                    show: true,
-                                    leftBtn:'home',
-                                    showBackground:true
-                              }
-                        },
-                  },
-                  {
-                        path: '/category',
-                        name: 'Category',
-                        component: () => import('@/views/category/Category.vue'),
-                        meta: {
-                              title: 'UniMall - Category',
-                              keepAlive: true,
-                              navBar: {
-                                    show: false,
-                              }
-                        },
-                  },
-                  {
-                        path: '/cart',
-                        name: 'Cart',
-                        component: () => import('@/views/cart/Cart.vue'),
-                        meta: {
-                              title: 'UniMall - Cart',
-                              keepAlive: true,
-                              navBar: {
-                                    show: false,
-                              }
-                        },
-                  },
-                  {
-                        path: '/user',
-                        name: 'User',
-                        component: () => import('@/views/user/User.vue'),
-                        meta: {
-                              title: 'UniMall - User',
-                              keepAlive: true,
-                              navBar: {
-                                    show: false,
-                              }
-                        },
-                  },
-            ],
+            redirect: '/home'
       },
       // address
       {
@@ -87,6 +100,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -101,6 +117,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -115,6 +134,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -128,6 +150,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -142,6 +167,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -156,6 +184,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -169,6 +200,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -184,6 +218,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -198,6 +235,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -213,6 +253,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -228,6 +271,9 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'search'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
@@ -241,19 +287,21 @@ const routes: Array<RouteRecordRaw> = [
                         show: true, 
                         leftBtn: 'back',
                         rightBtn: 'share'
+                  },
+                  tabBar: {
+                        show: false
                   }
             },
       },
-
-
-
-
       {
             path: '/:pathMatch(.*)*',
             name: 'NotFound',
             component: () => import('@/views/404.vue'),
             meta: {
                   title: '页面未找到',
+                  tabBar: {
+                        show: false
+                  }
             },
       },
 ]

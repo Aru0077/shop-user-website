@@ -15,8 +15,7 @@ body {
   font-size: 14px;
 }
 .pageContent{
-  padding:20px 15px 0px 15px;
-  overflow-y: auto;
+  padding:10px 15px 0px 15px;
 }
 /* 修复底部安全区域 */
 .safe-area-bottom {
@@ -38,6 +37,12 @@ body {
 /* 隐藏滚动条但保留功能 */
 ::-webkit-scrollbar {
   display: none;
+}
+
+/* 添加以下代码 */
+* {
+  -ms-overflow-style: none;  /* IE和Edge浏览器 */
+  scrollbar-width: none;  /* Firefox浏览器 */
 }
 
 /* 基础动画 */
