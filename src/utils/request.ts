@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { getAuthToken } from '@/utils/auth'
+import { getAuthToken } from '@/store/user.store'
 import { showNotify, showLoadingToast, closeToast } from 'vant'
 import 'vant/es/toast/style'
 import 'vant/es/notify/style'

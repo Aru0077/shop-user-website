@@ -1,7 +1,7 @@
-// src/api/modules/user.ts
-import { get, post, del } from '../request';
+// src/api/user.ts
+import { get, post, del } from '@/utils/request';
 import {
-      BaseResponse,
+      ApiResponse,
       LoginResponseData,
       RegisterParams,
       LoginParams,
@@ -14,7 +14,7 @@ import {
  * @param data 注册信息
  */
 export function register(data: RegisterParams) {
-      return post<BaseResponse<UserInfo>>('/shop/user/register', data);
+      return post<ApiResponse<UserInfo>>('/shop/user/register', data);
 }
 
 /**
@@ -22,14 +22,14 @@ export function register(data: RegisterParams) {
  * @param data 登录信息
  */
 export function login(data: LoginParams) {
-      return post<BaseResponse<LoginResponseData>>('/shop/user/login', data);
+      return post<ApiResponse<LoginResponseData>>('/shop/user/login', data);
 }
 
 /**
  * 用户登出
  */
 export function logout() {
-      return post<BaseResponse<null>>('/shop/user/logout');
+      return post<ApiResponse<null>>('/shop/user/logout');
 }
 
 /**
@@ -37,5 +37,5 @@ export function logout() {
  * @param data 删除账号请求数据（包含密码）
  */
 export function deleteAccount(data: DeleteAccountParams) {
-      return del<BaseResponse<null>>('/shop/user/account', { data });
+      return del<ApiResponse<null>>('/shop/user/account', { data });
 }
