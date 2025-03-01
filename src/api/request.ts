@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-
-// import { getToken } from '@/utils/auth'
+import { getAuthToken } from '@/utils/auth'
 import { showNotify, showLoadingToast, closeToast } from 'vant'
 import 'vant/es/toast/style'
 import 'vant/es/notify/style'
@@ -27,10 +26,10 @@ service.interceptors.request.use(
             }
 
             // 添加 token
-            // const token = getToken()
-            // if (token && config.headers) {
-            //       config.headers.Authorization = `Bearer ${token}`
-            // }
+            const token = getAuthToken()
+            if (token && config.headers) {
+                  config.headers.Authorization = `Bearer ${token}`
+            }
 
             return config
       },
@@ -48,8 +47,8 @@ service.interceptors.response.use(
 
             const res = response.data
 
-            // 根据自定义错误码判断请求是否成功
-            if (res.code && res.code !== 200) {
+            // 判断后端的自定义响应格式
+            if (res.success === false) {
                   // 处理错误
                   showNotify({
                         type: 'danger',
@@ -57,10 +56,13 @@ service.interceptors.response.use(
                   })
 
                   // 401: Token 过期
-                  if (res.code === 401) {
+                  if (response.status === 401 || res.message?.includes('登录已过期')) {
                         // 重新登录
-                        localStorage.removeItem('token')
-                        window.location.href = '/login'
+                        localStorage.removeItem('ACCESS_TOKEN')
+                        localStorage.removeItem('USER_INFO')
+                        setTimeout(() => {
+                              window.location.href = '/login'
+                        }, 1500)
                   }
 
                   return Promise.reject(new Error(res.message || 'Error'))
@@ -82,8 +84,11 @@ service.interceptors.response.use(
                               break
                         case 401:
                               message = '未授权，请重新登录'
-                              localStorage.removeItem('token')
-                              window.location.href = '/login'
+                              localStorage.removeItem('ACCESS_TOKEN')
+                              localStorage.removeItem('USER_INFO')
+                              setTimeout(() => {
+                                    window.location.href = '/login'
+                              }, 1500)
                               break
                         case 403:
                               message = '拒绝访问'
