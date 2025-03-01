@@ -155,6 +155,22 @@ const routes: Array<RouteRecordRaw> = [
                   }
             },
       },
+      {
+            path: '/register',
+            name: 'Register',
+            component: () => import('@/views/auth/Register.vue'),
+            meta: {
+                  title: 'UniMall - Register',
+                  navBar: {
+                        show: true, 
+                        leftBtn: 'back',
+                        rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
+                  }
+            },
+      },
       // favorite
       {
             path: '/favorite',
