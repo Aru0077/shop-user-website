@@ -112,6 +112,8 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
       (response: AxiosResponse) => {
+            console.log('结果:', response.data);
+            
             // 从队列中移除已完成的请求
             removePendingRequest(response.config);
 

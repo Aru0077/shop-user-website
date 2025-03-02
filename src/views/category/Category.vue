@@ -1,12 +1,12 @@
 <template>
     <div class="pageContent">
         <div class="px-[5px]">
-          <div class="text-[25px] font-bold leading-4 text-black">Category</div>
+            <div class="text-[25px] font-bold leading-4 text-black">Category</div>
         </div>
 
         <!-- 占位容器 -->
         <div style="height: 18px;"></div>
-        
+
         <van-empty v-if="loading" description="加载中..." />
 
         <van-collapse v-else v-model="activeNames" accordion>
@@ -59,8 +59,10 @@ const loadCategoryData = async () => {
 // 跳转到商品列表页（预留方法）
 const navigateToProductList = (category: Category) => {
     console.log('Navigate to category products:', category.id);
-    // 预留跳转方法，实际实现时取消注释
-    // router.push({ name: 'CategoryProducts', params: { categoryId: category.id.toString() } });
+    router.push({
+        path: '/product/list',
+        query: { type: 'category', id: category.id }
+    });
 };
 
 // 页面加载时获取分类数据
@@ -74,7 +76,7 @@ onMounted(() => {
     background-color: transparent;
     border-radius: 8px;
     overflow: hidden;
-    
+
 }
 
 :deep(.van-collapse-item) {

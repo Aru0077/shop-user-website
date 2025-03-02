@@ -295,7 +295,6 @@ const routes: Array<RouteRecordRaw> = [
                   navBar: {
                         show: true,
                         leftBtn: 'back',
-                        rightBtn: 'search'
                   },
                   tabBar: {
                         show: false

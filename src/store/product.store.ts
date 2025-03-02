@@ -8,7 +8,8 @@ import {
       getTopSellingProducts,
       getPromotionProducts,
       getCategoryProducts,
-      getProductDetail
+      getProductDetail,
+      searchProducts
 } from '@/api/product.api';
 import {
       Category,
@@ -206,6 +207,69 @@ export const useProductStore = defineStore('product', () => {
             };
       }
 
+      // 方法: 根据类型加载商品
+      async function loadProductsByType(
+            type: string,
+            params: {
+                  id?: string | number;
+                  keyword?: string;
+                  page?: number;
+                  limit?: number;
+                  sort?: ProductSortType;
+            } = {}
+      ) {
+            // 设置默认分页参数
+            const page = params.page || 1;
+            const limit = params.limit || 10;
+            const sort = params.sort || ProductSortType.NEWEST;
+
+            try {
+                  loading.value = true;
+                  let result: Product[] = [];
+
+                  switch (type) {
+                        case 'category':
+                              if (params.id) {
+                                    result = await loadCategoryProducts(
+                                          Number(params.id),
+                                          page,
+                                          limit,
+                                          sort
+                                    );
+                              }
+                              break;
+                        case 'latest':
+                              result = await loadLatestProducts(page, limit);
+                              break;
+                        case 'topselling':
+                              result = await loadTopSellingProducts(page, limit);
+                              break;
+                        case 'promotion':
+                              result = await loadPromotionProducts(page, limit);
+                              break;
+                        case 'search':
+                              if (params.keyword) {
+                                    // 使用搜索API（需要提前导入）
+                                    const res = await searchProducts(params.keyword, page, limit);
+                                    const data = res.data;
+                                    result = data.data;
+                                    updatePaginationInfo(data);
+                              }
+                              break;
+                        default:
+                              result = await loadLatestProducts(page, limit);
+                              break;
+                  }
+
+                  return result;
+            } catch (error) {
+                  console.error(`Failed to load ${type} products:`, error);
+                  return [] as Product[];
+            } finally {
+                  loading.value = false;
+            }
+      }
+
       // 方法: 清除当前商品信息
       function clearCurrentProduct() {
             currentProduct.value = null;
@@ -237,7 +301,8 @@ export const useProductStore = defineStore('product', () => {
             loadPromotionProducts,
             loadCategoryProducts,
             loadProductDetail,
-            clearCurrentProduct
+            clearCurrentProduct,
+            loadProductsByType
       };
 }, {
       persist: true  // 添加持久化配置
