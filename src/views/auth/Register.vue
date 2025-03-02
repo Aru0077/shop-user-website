@@ -14,43 +14,45 @@
             <!-- 注册表单区域 -->
             <div class="register-options px-4 flex-1">
                   <!-- 账号密码注册表单 -->
-                  <form @submit.prevent="handleEmailSignup">
-                        <!-- 全名输入框 -->
-                        <van-field v-model="fullName" name="fullName" label="Full Name"
-                              placeholder="Enter your full name"
-                              :rules="[{ required: true, message: 'Full name is required' }]"
-                              class="mb-1 rounded-lg overflow-hidden bg-white" />
+                  <van-form @submit="handleEmailSignup">
+                        <van-cell-group inset>
+                              <!-- 用户名输入框 -->
+                              <van-field v-model="formData.username" name="username" label="Username"
+                                    placeholder="Enter your username" :rules="rules.username"
+                                    class="rounded-lg overflow-hidden bg-white" />
 
-                        <!-- 邮箱输入框 -->
-                        <van-field v-model="email" name="email" label="Email" placeholder="Enter your email"
-                              :rules="[{ required: true, message: 'Email is required' }]"
-                              class="mb-1 rounded-lg overflow-hidden bg-white" />
+                              <!-- 密码输入框 -->
+                              <van-field v-model="formData.password" type="password" name="password" label="Password"
+                                    placeholder="Create a password" :rules="rules.password"
+                                    class="rounded-lg overflow-hidden bg-white" />
 
-                        <!-- 密码输入框 -->
-                        <van-field v-model="password" type="password" name="password" label="Password"
-                              placeholder="Create a password"
-                              :rules="[{ required: true, message: 'Password is required' }]"
-                              class="mb-1 rounded-lg overflow-hidden bg-white" />
-
-                        <!-- 确认密码输入框 -->
-                        <van-field v-model="confirmPassword" type="password" name="confirmPassword"
-                              label="Confirm Password" placeholder="Confirm your password"
-                              :rules="[{ required: true, message: 'Please confirm your password' }]"
-                              class="mb-2 rounded-lg overflow-hidden bg-white" />
+                              <!-- 确认密码输入框 -->
+                              <van-field v-model="formData.confirmPassword" type="password" name="confirmPassword"
+                                    label="Confirm Password" placeholder="Confirm your password"
+                                    :rules="rules.confirmPassword" class="rounded-lg overflow-hidden bg-white" />
+                        </van-cell-group>
 
                         <!-- 服务条款复选框 -->
-                        <van-checkbox v-model="agreedToTerms" shape="square" class="mb-2 text-[14px]">
-                              I agree to the <router-link to="/terms" class="text-blue-600">Terms of
-                                    Service</router-link> and <router-link to="/privacy" class="text-blue-600">Privacy
-                                    Policy</router-link>
-                        </van-checkbox>
+                        <div class="px-4 my-4">
+                              <van-checkbox v-model="formData.agreedToTerms" shape="square" class="text-[14px]">
+                                    I agree to the <router-link to="/terms" class="text-blue-600">Terms of
+                                          Service</router-link> and <router-link to="/privacy"
+                                          class="text-blue-600">Privacy
+                                          Policy</router-link>
+                              </van-checkbox>
+                              <div v-if="showTermsError" class="text-red-500 text-xs mt-1">
+                                    You must agree to the terms and privacy policy
+                              </div>
+                        </div>
 
                         <!-- 注册按钮 -->
-                        <van-button type="primary" size="normal" round block native-type="submit" :loading="isLoading"
-                              :disabled="!agreedToTerms" class="mb-4">
-                              Sign Up
-                        </van-button>
-                  </form>
+                        <div style="margin: 16px;">
+                              <van-button type="primary" size="normal" round block native-type="submit"
+                                    :loading="isLoading">
+                                    Sign Up
+                              </van-button>
+                        </div>
+                  </van-form>
 
                   <!-- 已有账号链接 -->
                   <div class="text-center mt-1 mb-1">
@@ -74,55 +76,82 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { showNotify, showDialog } from 'vant';
 import UniMallLogo from '@/assets/images/unimall.png'
+import { register } from '@/api/user.api';
 
-// 状态变量
-const fullName = ref('');
-const email = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const agreedToTerms = ref(false);
+// 表单数据 
+const formData = ref({
+      username: '',
+      password: '',
+      confirmPassword: '',
+      agreedToTerms: false
+});
+
+// 密码匹配验证
+const validatePasswordMatch = (val) => {
+      return val === formData.value.password;
+};
+
+// 定义验证规则
+const rules = {
+      username: [
+            { required: true, message: 'Username is required' },
+            { min: 3, message: 'Username must be at least 3 characters' },
+            { max: 50, message: 'Username cannot exceed 50 characters' }
+      ],
+      password: [
+            { required: true, message: 'Password is required' },
+            { min: 6, message: 'Password must be at least 6 characters' },
+            { max: 50, message: 'Password cannot exceed 50 characters' }
+      ],
+      confirmPassword: [
+            { required: true, message: 'Please confirm your password' },
+            { validator: validatePasswordMatch, message: 'Passwords must match' }
+      ]
+};
+
+// 状态变量 
 const isLoading = ref(false);
 const router = useRouter();
+const showTermsError = ref(false);
 
-// 邮箱密码注册处理
-const handleEmailSignup = () => {
-      // 验证表单
-      if (!fullName.value || !email.value || !password.value || !confirmPassword.value) {
-            showNotify({ type: 'warning', message: 'Please fill in all required fields' });
+
+
+// 注册处理
+const handleEmailSignup = async () => {
+      // 验证服务条款是否勾选
+      if (!formData.value.agreedToTerms) {
+            showTermsError.value = true;
             return;
       }
 
-      if (!agreedToTerms.value) {
-            showNotify({ type: 'warning', message: 'Please agree to the Terms of Service' });
-            return;
-      }
+      showTermsError.value = false;
 
-      if (password.value !== confirmPassword.value) {
-            showNotify({ type: 'danger', message: 'Passwords do not match' });
-            return;
-      }
+      try {
+            isLoading.value = true;
 
-      if (password.value.length < 8) {
-            showNotify({ type: 'warning', message: 'Password must be at least 8 characters' });
-            return;
-      }
+            // 调用注册API，仅传递后端需要的字段
+            await register({
+                  username: formData.value.username,
+                  password: formData.value.password
+            });
 
-      isLoading.value = true;
-
-      // 这里添加邮箱注册逻辑
-      // 例如: 调用注册API
-      setTimeout(() => {
-            // 模拟注册成功
-            isLoading.value = false;
-            showDialog({
+            // 显示注册成功对话框
+            await showDialog({
                   title: 'Registration Successful',
                   message: 'Your account has been created successfully.',
-                  confirmButtonText: 'Continue to Shopping',
+                  confirmButtonText: 'Continue to Login',
                   confirmButtonColor: '#4f46e5',
-            }).then(() => {
-                  router.push('/home');
             });
-      }, 1500);
+
+            router.push('/login');
+      } catch (error: any) {
+            showNotify({
+                  type: 'danger',
+                  message: error.response?.data?.message || 'Registration failed. Please try again later.'
+            });
+      } finally {
+            isLoading.value = false;
+      }
 };
 </script>
 

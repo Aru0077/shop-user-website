@@ -6,8 +6,8 @@
                   <div v-for="(product, index) in products" :key="index" class="product-card">
                         <!-- 商品图片容器 -->
                         <div class="relative overflow-hidden mb-0.5">
-                              <img :src="product.imageUrl" :alt="product.title"
-                                    class="w-full aspect-square object-cover rounded-md" />
+                              <OptimizedImage :src="product.imageUrl" :alt="product.title" :aspect-ratio="1"
+                                    image-class="rounded-md" objectFit="cover" />
                         </div>
 
                         <!-- 商品信息 -->
@@ -22,12 +22,13 @@
                               <div class="text-[14px] font-bold">${{ product.price.toFixed(2) }}</div>
                         </div>
                   </div>
-            </div> 
+            </div>
       </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps, defineEmits, withDefaults } from 'vue';
+import OptimizedImage from '@/components/common/OptimizedImage.vue';
 
 // 定义商品类型
 interface Product {

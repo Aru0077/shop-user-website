@@ -3,8 +3,8 @@
   <div id="app" class="w-screen h-screen overflow-hidden flex flex-col">
     <!-- 顶部导航栏 - 固定高度 -->
     <div class="w-full z-20 flex-shrink-0">
-      <nav-bar v-if="navBarConfig.show" :left-btn="navBarConfig.leftBtn"
-        :right-btn="navBarConfig.rightBtn" :show-background="navBarConfig.showBackground" />
+      <nav-bar v-if="navBarConfig.show" :left-btn="navBarConfig.leftBtn" :right-btn="navBarConfig.rightBtn"
+        :show-background="navBarConfig.showBackground" />
     </div>
 
     <!-- 中间内容区域 - 可滚动，占据剩余空间 -->
@@ -24,11 +24,16 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, computed } from "vue";
+import { onMounted, onBeforeUnmount, computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import NavBar from "./components/common/NavBar.vue";
 import CustomTabBar from "./components/common/CustomTabBar.vue";
+import { getOptimizationLevel, isFacebookBrowser } from "@/utils/browser";
+
+// 优化级别
+const optimizationLevel = ref(getOptimizationLevel());
+const isFB = ref(isFacebookBrowser());
 
 // 监听窗口大小变化，用于响应式设计
 const { width } = useWindowSize();
@@ -80,6 +85,18 @@ onMounted(() => {
     },
     { passive: false },
   );
+
+  // 为Facebook浏览器添加特殊类
+  if (isFB.value) {
+    document.body.classList.add('fb-webview');
+  }
+
+  // 针对高优化级别减少动画
+  if (optimizationLevel.value === 'high') {
+    document.body.classList.add('reduce-animations');
+  }
+
+
 });
 
 onBeforeUnmount(() => {
@@ -89,6 +106,16 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style>
 
+<style>
+.fb-webview .fade-enter-active,
+.fb-webview .fade-leave-active,
+.fb-webview .slide-right-enter-active,
+.fb-webview .slide-right-leave-active,
+.reduce-animations .fade-enter-active,
+.reduce-animations .fade-leave-active,
+.reduce-animations .slide-right-enter-active,
+.reduce-animations .slide-right-leave-active {
+  transition: all 0.15s linear;
+}
 </style>

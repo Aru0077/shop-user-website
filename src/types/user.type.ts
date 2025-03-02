@@ -8,8 +8,6 @@ export interface UserInfo {
     id: string;
     username: string;
     createdAt?: string;
-    facebookId?: string;
-    isBlacklist?: number;
 }
 
 /**

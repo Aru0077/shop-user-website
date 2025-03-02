@@ -32,23 +32,26 @@
             </div>
 
             <!-- 账号密码登录表单 -->
-            <form @submit.prevent="handleEmailLogin">
-                <!-- 邮箱输入框 -->
-                <van-field v-model="email" name="email" label="Email" placeholder="Enter your email"
-                    :rules="[{ required: true, message: 'Email is required' }]"
-                    class="mb-1 rounded-lg overflow-hidden bg-white" />
+            <van-form @submit="handleEmailLogin"> 
+                <van-cell-group inset>
+                    <!-- 用户名输入框 -->
+                    <van-field v-model="formData.username" name="username" label="Username"
+                        placeholder="Enter your username" :rules="rules.username"
+                        class="rounded-lg overflow-hidden bg-white" />
 
-                <!-- 密码输入框 -->
-                <van-field v-model="password" type="password" name="password" label="Password"
-                    placeholder="Enter your password" :rules="[{ required: true, message: 'Password is required' }]"
-                    class="mb-2 rounded-lg overflow-hidden bg-white" />
+                    <!-- 密码输入框 -->
+                    <van-field v-model="formData.password" type="password" name="password" label="Password"
+                        placeholder="Enter your password" :rules="rules.password"
+                        class="rounded-lg overflow-hidden bg-white" />
+                </van-cell-group>
 
                 <!-- 登录按钮 -->
-                <van-button type="primary" size="normal" round block native-type="submit" :loading="isLoading"
-                    class="mb-4">
-                    Sign In
-                </van-button>
-            </form>
+                <div style="margin: 16px;">
+                    <van-button type="primary" size="normal" round block native-type="submit" :loading="isLoading">
+                        Sign In
+                    </van-button>
+                </div>
+            </van-form>
 
             <!-- 忘记密码和注册链接 -->
             <div class="text-center mt-1 mb-1">
@@ -72,44 +75,65 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { showNotify } from 'vant';
 import UniMallLogo from '@/assets/images/unimall.png'
+import { useUserStore } from '@/store/user.store';
 
-// 状态变量
-const email = ref('');
-const password = ref('');
+// 表单数据
+const formData = ref({
+    username: '',
+    password: ''
+});
+
+// 定义验证规则
+const rules = {
+    username: [
+        { required: true, message: 'Username is required' },
+        { min: 3, message: 'Username must be at least 3 characters' },
+        { max: 50, message: 'Username cannot exceed 50 characters' }
+    ],
+    password: [
+        { required: true, message: 'Password is required' },
+        { min: 6, message: 'Password must be at least 6 characters' },
+        { max: 50, message: 'Password cannot exceed 50 characters' }
+    ]
+};
+
+// 状态变量 
 const isLoading = ref(false);
 const router = useRouter();
+const userStore = useUserStore();
 
 // Facebook登录处理
 const handleFacebookLogin = () => {
-    isLoading.value = true;
-
-    // 这里添加Facebook登录逻辑
-    // 例如: 调用OAuth API或SDK
-    setTimeout(() => {
-        // 模拟登录成功
-        isLoading.value = false;
-        showNotify({ type: 'success', message: 'Facebook login successful' });
-        router.push('/home');
-    }, 1500);
+    showNotify({
+        type: 'warning',
+        message: 'Social login feature is not available yet'
+    });
 };
 
 // 邮箱密码登录处理
-const handleEmailLogin = () => {
-    if (!email.value || !password.value) {
-        showNotify({ type: 'warning', message: 'Please enter email and password' });
-        return;
-    }
+const handleEmailLogin = async (values) => {
+    try {
+        isLoading.value = true;
 
-    isLoading.value = true;
+        // 调用登录API
+        await userStore.login({
+            username: formData.value.username,
+            password: formData.value.password
+        });
 
-    // 这里添加邮箱登录逻辑
-    // 例如: 调用登录API
-    setTimeout(() => {
-        // 模拟登录成功
-        isLoading.value = false;
         showNotify({ type: 'success', message: 'Login successful' });
-        router.push('/home');
-    }, 1500);
+
+        // 获取重定向地址或默认跳转到首页
+        const redirect = router.currentRoute.value.query.redirect as string || '/home';
+        router.push(redirect);
+    } catch (error: any) {
+        showNotify({
+            type: 'danger',
+            message: error.response?.data?.message || 'Login failed. Please check your username and password.'
+        });
+    } finally {
+        isLoading.value = false;
+    }
 };
 </script>
 

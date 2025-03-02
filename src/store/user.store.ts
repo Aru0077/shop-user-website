@@ -3,34 +3,25 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { login as loginApi, logout as logoutApi, deleteAccount as deleteAccountApi } from '@/api/user.api';
 import { UserInfo, LoginParams, DeleteAccountParams } from '@/types/user.type';
+import { saveTokens, getAccessToken, clearTokens } from '@/utils/tokenManager';
 import storage from '@/utils/storage';
 
 // 本地存储键名定义
-const TOKEN_KEY = 'ACCESS_TOKEN';
 const USER_INFO_KEY = 'USER_INFO';
 
 // 定义用户Store - 使用组合式API写法
 export const useUserStore = defineStore('user', () => {
-    // 初始化状态，直接从storage获取初始值
-    const token = ref<string>(storage.get(TOKEN_KEY, ''));
+    // 初始化状态，从storage获取用户信息
     const userInfo = ref<UserInfo | null>(storage.get(USER_INFO_KEY, null));
-    const isLoggedIn = ref<boolean>(!!token.value);
+    const isLoggedIn = ref<boolean>(!!getAccessToken());
 
     // 计算属性
-    const getToken = computed(() => token.value);
     const getUserInfo = computed(() => userInfo.value);
     const getIsLoggedIn = computed(() => isLoggedIn.value);
 
     // 获取token (供外部API调用使用)
     function getAuthToken(): string {
-        return token.value;
-    }
-
-    // 设置Token
-    function setUserToken(tokenValue: string) {
-        token.value = tokenValue;
-        storage.set(TOKEN_KEY, tokenValue);
-        isLoggedIn.value = true;
+        return getAccessToken();
     }
 
     // 设置用户信息
@@ -41,22 +32,22 @@ export const useUserStore = defineStore('user', () => {
 
     // 清除用户信息
     function clearUserInfo() {
-        token.value = '';
         userInfo.value = null;
         isLoggedIn.value = false;
-        storage.remove(TOKEN_KEY);
         storage.remove(USER_INFO_KEY);
+        clearTokens();
     }
 
     // 用户登录
     async function login(loginData: LoginParams) {
         try {
             const res = await loginApi(loginData);
-            const { token: tokenValue, user } = res.data;
+            const { token, user } = res.data;
 
-            // 保存令牌和用户信息
-            setUserToken(tokenValue);
+            // 简化为单令牌存储
+            saveTokens(token);
             setUserData(user);
+            isLoggedIn.value = true;
 
             return Promise.resolve(res);
         } catch (error) {
@@ -71,6 +62,8 @@ export const useUserStore = defineStore('user', () => {
             clearUserInfo();
             return Promise.resolve(true);
         } catch (error) {
+            // 即使API调用失败，也清除本地信息
+            clearUserInfo();
             return Promise.reject(error);
         }
     }
@@ -88,12 +81,10 @@ export const useUserStore = defineStore('user', () => {
 
     return {
         // 状态
-        token,
         userInfo,
         isLoggedIn,
 
         // 计算属性
-        getToken,
         getUserInfo,
         getIsLoggedIn,
 
@@ -102,8 +93,9 @@ export const useUserStore = defineStore('user', () => {
         login,
         logout,
         deleteAccount,
-        setUserToken,
         setUserData,
         clearUserInfo
     };
+}, {
+    persist: true
 });

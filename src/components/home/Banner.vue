@@ -2,10 +2,12 @@
 <template>
       <div class="relative h-[160px] rounded-[20px] overflow-hidden cursor-pointer" @click="handleBannerClick">
             <!-- 背景图片 -->
-            <img :src="imageUrl" alt="Banner图片" class="w-full h-full object-cover" />
+            <OptimizedImage :src="imageUrl" :alt="title" priority="high" image-class="w-full h-full" objectFit="cover"
+                  :fixedHeight="true" />
 
             <!-- 内容层 -->
-            <div class="absolute top-0 left-0 p-[15px_15px_17px_15px] h-[130px] flex flex-col items-start justify-between">
+            <div
+                  class="absolute top-0 left-0 p-[15px_15px_17px_15px] h-[130px] flex flex-col items-start justify-between">
                   <!-- 文本区域 -->
                   <div class="flex flex-col h-full items-start justify-around pb-1.5">
                         <!-- 主标题 -->
@@ -29,6 +31,7 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
+import OptimizedImage from '@/components/common/OptimizedImage.vue';
 
 // 定义属性
 const props = defineProps({
