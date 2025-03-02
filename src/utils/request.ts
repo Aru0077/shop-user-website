@@ -136,6 +136,11 @@ export function put<T>(url: string, data?: any, config?: AxiosRequestConfig): Pr
       return service.put(url, data, config)
 }
 
+// 封装 PATCH 请求
+export function patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+      return service.patch(url, data, config)
+}
+
 // 封装 DELETE 请求
 export function del<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
       return service.delete(url, config)

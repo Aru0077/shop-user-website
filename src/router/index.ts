@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { useUserStore } from '@/store/user.store'
 
 // 路由元数据类型定义
 declare module 'vue-router' {
@@ -30,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
                   keepAlive: true,
                   navBar: {
                         show: true,
-                        leftBtn:'home',
+                        leftBtn: 'home',
                   },
                   tabBar: {
                         show: true
@@ -58,6 +59,7 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/cart/Cart.vue'),
             meta: {
                   title: 'UniMall - Cart',
+                  auth: true, // 购物车需要登录
                   keepAlive: true,
                   navBar: {
                         show: false,
@@ -73,6 +75,7 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/user/User.vue'),
             meta: {
                   title: 'UniMall - User',
+                  auth: true, // 用户中心需要登录
                   keepAlive: true,
                   navBar: {
                         show: false,
@@ -94,9 +97,10 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/address/AddressList.vue'),
             meta: {
                   title: 'UniMall - AddressList',
+                  auth: true, // 地址管理需要登录
                   keepAlive: true,
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -107,13 +111,14 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
             path: '/address/add',
-            name: 'UniMall - AddressAdd',
+            name: 'AddressAdd',
             component: () => import('@/views/address/AddressAdd.vue'),
             meta: {
-                  title: 'AddressAdd',
+                  title: 'UniMall - AddressAdd',
+                  auth: true, // 添加地址需要登录
                   keepAlive: true,
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -129,8 +134,9 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/auth/DeleteAccount.vue'),
             meta: {
                   title: 'UniMall - DeleteAccount',
+                  auth: true, // 删除账号需要登录
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -146,7 +152,7 @@ const routes: Array<RouteRecordRaw> = [
             meta: {
                   title: 'UniMall - Login',
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -162,7 +168,7 @@ const routes: Array<RouteRecordRaw> = [
             meta: {
                   title: 'UniMall - Register',
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -178,8 +184,9 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/favorite/Favorite.vue'),
             meta: {
                   title: 'UniMall - Favorite',
+                  auth: true, // 收藏需要登录
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -191,12 +198,12 @@ const routes: Array<RouteRecordRaw> = [
       // legal
       {
             path: '/privacy',
-            name: 'privacy',
+            name: 'Privacy',
             component: () => import('@/views/legal/Privacy.vue'),
             meta: {
                   title: 'UniMall - Privacy',
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -212,7 +219,7 @@ const routes: Array<RouteRecordRaw> = [
             meta: {
                   title: 'UniMall - Terms',
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -230,7 +237,7 @@ const routes: Array<RouteRecordRaw> = [
                   title: 'UniMall - Order',
                   auth: true,
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -247,7 +254,7 @@ const routes: Array<RouteRecordRaw> = [
                   title: 'UniMall - OrderDetail',
                   auth: true,
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -265,7 +272,7 @@ const routes: Array<RouteRecordRaw> = [
                   title: 'UniMall - Payment',
                   auth: true,
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'none'
                   },
@@ -283,7 +290,7 @@ const routes: Array<RouteRecordRaw> = [
                   title: 'UniMall - ProductList',
                   keepAlive: true,
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'search'
                   },
@@ -299,7 +306,7 @@ const routes: Array<RouteRecordRaw> = [
             meta: {
                   title: 'UniMall - ProductDetail',
                   navBar: {
-                        show: true, 
+                        show: true,
                         leftBtn: 'back',
                         rightBtn: 'share'
                   },
@@ -334,16 +341,22 @@ const router = createRouter({
       },
 })
 
+// 不需要重定向的白名单路由
+const whiteList = ['/login', '/register', '/home', '/category', '/product/list', '/product/detail', '/privacy', '/terms']
+
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
       // 设置页面标题
       document.title = `${to.meta.title || '购物商城'}`
 
+      // 使用 Pinia store 检查登录状态
+      const userStore = useUserStore()
+      const isLoggedIn = userStore.getIsLoggedIn
+
       // 判断是否需要登录权限
       if (to.meta.auth) {
-            // 这里编写登录验证逻辑
-            const isLoggedIn = localStorage.getItem('token')
             if (!isLoggedIn) {
+                  // 未登录，跳转到登录页并保存原始请求路径
                   next({
                         path: '/login',
                         query: { redirect: to.fullPath },
@@ -351,7 +364,30 @@ router.beforeEach((to, from, next) => {
                   return
             }
       }
-      next()
+
+      // 如果已登录且要跳转登录页，重定向到首页或之前请求的页面
+      if (isLoggedIn && (to.path === '/login' || to.path === '/register')) {
+            // 如果有重定向参数，则跳转到相应页面
+            const redirect = from.query.redirect as string || '/home'
+            next({ path: redirect })
+            return
+      }
+
+      // 白名单路径直接放行
+      if (whiteList.some(path => to.path.startsWith(path))) {
+            next()
+            return
+      }
+
+      // 其他路径，如果已登录则放行，否则重定向到登录页
+      if (isLoggedIn) {
+            next()
+      } else {
+            next({
+                  path: '/login',
+                  query: { redirect: to.fullPath },
+            })
+      }
 })
 
 // 路由后置守卫
