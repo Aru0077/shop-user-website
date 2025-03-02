@@ -71,15 +71,28 @@ const containerStyle = computed(() => {
 
 // 使用WebP格式（如果浏览器支持）
 const imageSrc = computed(() => {
-      // 实际项目中应该根据CDN或后端API提供的WebP转换服务来实现
-      return props.src;
+      // 如果支持WebP，优先使用WebP格式
+      const supportsWebP = navigator.userAgent.indexOf('Safari') === -1 ||
+            navigator.userAgent.indexOf('Chrome') > -1;
+      const webpParam = supportsWebP && !props.src.includes('.svg') ? '&format=webp' : '';
+
+      // 添加宽度参数，实现响应式图片
+      return `${props.src}?width=${window.innerWidth}${webpParam}`;
 });
 
 // 生成响应式图片srcset
 const generateSrcSet = computed(() => {
-      // 这里应该根据实际的图片服务来生成不同尺寸的图片URL
-      // 示例: `${props.src}?w=480 480w, ${props.src}?w=800 800w`
-      return '';
+      if (!props.src) return '';
+      const supportsWebP = navigator.userAgent.indexOf('Safari') === -1 ||
+            navigator.userAgent.indexOf('Chrome') > -1;
+      const webpParam = supportsWebP && !props.src.includes('.svg') ? '&format=webp' : '';
+
+      // 返回多种尺寸的图片，支持各种屏幕密度
+      return `
+    ${props.src}?width=480${webpParam} 480w,
+    ${props.src}?width=800${webpParam} 800w,
+    ${props.src}?width=1200${webpParam} 1200w
+  `;
 });
 
 // 计算图片类名

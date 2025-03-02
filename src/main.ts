@@ -3,7 +3,6 @@ import App from './App.vue'
 import router from './router'
 import { createPinia } from 'pinia'
 import { Lazyload } from 'vant';
-import 'vant/es/lazyload/style';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { Icon } from "@iconify/vue";
 

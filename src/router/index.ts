@@ -25,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
       {
             path: '/home',
             name: 'Home',
-            component: () => import('@/views/home/Home.vue'),
+            component: () => import(/* webpackChunkName: "home" */ '@/views/home/Home.vue'),
             meta: {
                   title: 'UniMall - Home',
                   keepAlive: true,
@@ -72,7 +72,7 @@ const routes: Array<RouteRecordRaw> = [
       {
             path: '/user',
             name: 'User',
-            component: () => import('@/views/user/User.vue'),
+            component: () => import(/* webpackChunkName: "user" */ '@/views/user/User.vue'),
             meta: {
                   title: 'UniMall - User',
                   auth: true, // 用户中心需要登录

@@ -44,6 +44,16 @@ self.addEventListener('fetch', event => {
             return;
       }
 
+      // 针对HTML和核心JS使用网络优先策略
+      if (event.request.destination === 'document' ||
+            event.request.url.includes('main.js')) {
+            event.respondWith(
+                  fetch(event.request)
+                        .catch(() => caches.match(event.request))
+            );
+            return;
+      }
+
       // 对静态资源使用缓存优先策略
       event.respondWith(
             caches.match(event.request)

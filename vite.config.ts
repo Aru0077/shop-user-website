@@ -11,7 +11,11 @@ export default defineConfig({
     vue(),
     // 自动导入组件
     Components({
-      resolvers: [VantResolver()],
+      resolvers: [
+        VantResolver({
+          importStyle: true, // 自动导入对应的样式
+        }),
+      ],
       dts: true,
     }),
     // 构建分析 (添加命令行参数 --analyze 时启用)
@@ -56,31 +60,34 @@ export default defineConfig({
     // 构建时移除 console 和 debugger
     terserOptions: {
       compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.debug'], 
+        drop_console: process.env.NODE_ENV === 'production',
+        drop_debugger: process.env.NODE_ENV === 'production',
       },
     },
     // 分块策略
     rollupOptions: {
       output: {
-        // 将依赖拆分成不同的块
+        // 更合理的代码分割策略
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
             if (id.includes('vant')) return 'vendor-vant';
-            if (id.includes('vue')) return 'vendor-vue';
+            if (id.includes('vue') || id.includes('@vue')) return 'vendor-vue';
             if (id.includes('pinia')) return 'vendor-pinia';
             return 'vendor'; // 所有其他依赖
-          }
-          // 将页面代码拆分为单独的块
-          if (id.includes('/src/views/')) {
-            return id.split('/views/')[1].split('/')[0];
           }
         },
         // 静态资源分类打包 
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+        assetFileNames: ({name}) => {
+          if (/\.(gif|jpe?g|png|svg)$/.test(name ?? '')) {
+            return 'images/[name]-[hash][extname]';
+          }
+          if (/\.css$/.test(name ?? '')) {
+            return 'css/[name]-[hash][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
       },
     },
     // 启用 gzip 压缩
