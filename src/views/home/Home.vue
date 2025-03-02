@@ -14,57 +14,98 @@
     <!-- 占位容器 -->
     <div style="height: 30px;"></div>
 
-    <!-- banner -->
-    <Banner imageUrl="https://img.js.design/assets/img/60f77156d961d24e3cf74934.png" title="30% Off"
-      subtitle="On everything today" description="Updated on 2025-2-3" @banner-click="handleBannerClick"
-      @button-click="handleButtonClick" />
+    <!-- 加载状态 -->
+    <van-loading v-if="loading" type="spinner" size="24px" class="my-4 flex justify-center" />
 
-    <!-- 占位容器 -->
-    <div style="height: 30px;"></div>
+    <template v-else>
+      <!-- banner -->
+      <Banner :imageUrl="homeData?.banner?.imageUrl || 'https://img.js.design/assets/img/60f77156d961d24e3cf74934.png'"
+        :title="homeData?.banner?.title || '30% Off'" :subtitle="homeData?.banner?.content || 'On everything today'"
+        description="Limited time offer" @banner-click="handleBannerClick" @button-click="handleButtonClick" />
 
-    <!-- 新品推荐 -->
-    <div class="flex items-end justify-between mb-1.5 mt-1">
-      <div class="text-[18px] font-bold text-black">New Arrivals</div>
-      <div class="text-[11px] text-gray-700">View All</div>
-    </div>
-    <!-- 商品宫格列表 -->
-    <ProductGrid :products="productList" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
-      @click-product="navigateToProductDetail" />
+      <!-- 占位容器 -->
+      <div style="height: 30px;"></div>
 
-    <!-- 占位容器 -->
-    <div style="height: 30px;"></div>
+      <!-- 新品推荐 -->
+      <div class="flex items-end justify-between mb-1.5 mt-1">
+        <div class="text-[18px] font-bold text-black">New Arrivals</div>
+        <div class="text-[11px] text-gray-700 cursor-pointer" @click="viewAllLatest">View All</div>
+      </div>
+      <!-- 商品宫格列表 -->
+      <ProductGrid :products="formattedLatestProducts" @click-product="navigateToProductDetail" />
 
+      <!-- 占位容器 -->
+      <div style="height: 30px;"></div>
 
-    <!-- 热销商品 -->
-    <div class="flex items-end justify-between mb-1.5 mt-1">
-      <div class="text-[18px] font-bold text-black">New Arrivals</div>
-      <div class="text-[11px] text-gray-700">View All</div>
-    </div>
-    <!-- 商品宫格列表 -->
-    <ProductGrid :products="productList" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
-      @click-product="navigateToProductDetail" />
+      <!-- 热销商品 -->
+      <div class="flex items-end justify-between mb-1.5 mt-1">
+        <div class="text-[18px] font-bold text-black">Top Selling</div>
+        <div class="text-[11px] text-gray-700 cursor-pointer" @click="viewAllTopSelling">View All</div>
+      </div>
+      <!-- 商品宫格列表 -->
+      <ProductGrid :products="formattedTopSellingProducts" @click-product="navigateToProductDetail" />
+    </template>
 
-
+    <!-- 错误提示 -->
+    <van-empty v-if="error" description="加载失败，请下拉刷新重试" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted, onActivated } from 'vue';
 import { useRouter } from 'vue-router';
+import { showToast, showLoadingToast, closeToast } from 'vant';
 import SearchBar from '@/components/home/SearchBar.vue';
 import Banner from '@/components/home/Banner.vue';
 import ProductGrid from '@/components/product/ProductGrid.vue';
 import { navigateToProductList, navigateToProductDetail } from '@/utils/navigation';
+import { useProductStore } from '@/store/product.store';
+import { useFavoriteStore } from '@/store/favorite.store';
 
-const router = useRouter()
-const hasMoreProducts = ref(true);
+import { ProductSortType, HomeData } from '@/types/product.type';
 
-// 搜索值
+// 初始化路由和状态管理
+const router = useRouter();
+const productStore = useProductStore();
+const favoriteStore = useFavoriteStore();
+
+// 状态定义
+const loading = ref(false);
+const error = ref(false);
 const searchValue = ref('');
+const isPageActive = ref(true);
+
+// 首页数据
+const homeData = computed<HomeData | null>(() => productStore.getHomeDataValue);
+
+// 格式化最新商品数据
+const formattedLatestProducts = computed(() => {
+  return (homeData.value?.latestProducts || []).map(product => ({
+    id: product.id,
+    brand: product.name.split(' ')[0] || 'Brand', // 使用商品名称的第一部分作为品牌名
+    title: product.name,
+    price: product.skus?.[0]?.price || 0,
+    imageUrl: product.mainImage || 'https://img.js.design/assets/img/60f77157d961d24e3cf7493e.png'
+  })).slice(0, 4); // 仅显示前4个商品
+});
+
+// 格式化热卖商品数据
+const formattedTopSellingProducts = computed(() => {
+  return (homeData.value?.topSellingProducts || []).map(product => ({
+    id: product.id,
+    brand: product.name.split(' ')[0] || 'Brand',
+    title: product.name,
+    price: product.skus?.[0]?.price || 0,
+    imageUrl: product.mainImage || 'https://img.js.design/assets/img/60f77157d961d24e3cf74937.png'
+  })).slice(0, 4); // 仅显示前4个商品
+});
 
 // 搜索按钮点击事件
 const onSearch = (value: string) => {
   if (value.trim()) {
+    showLoadingToast({ message: '搜索中...', duration: 300 });
+
+    // 使用工具函数导航到搜索结果页
     navigateToProductList(router, {
       type: 'search',
       keyword: value.trim()
@@ -74,80 +115,85 @@ const onSearch = (value: string) => {
 
 // 清空搜索框内容
 const onClear = () => {
-  console.log('清空搜索');
-  // 清空搜索相关处理
+  searchValue.value = '';
 };
 
 // 点击banner
 const handleBannerClick = () => {
-  console.log('点击banner');
-  // 清空搜索相关处理
+  // 跳转到促销商品页面
+  navigateToProductList(router, {
+    type: 'promotion'
+  });
 };
 
-// 点击banner 中的按钮
+// 点击banner中的按钮
 const handleButtonClick = () => {
-  console.log('点击banner');
-  // 清空搜索相关处理
+  // 跳转到促销商品页面，可以传递额外参数
+  navigateToProductList(router, {
+    type: 'promotion',
+    sort: ProductSortType.PRICE_ASC  // 按价格从低到高排序
+  });
 };
 
-// 商品数据示例
-const productList = ref([
-  {
-    id: 1,
-    brand: 'The Marc Jacobs',
-    title: 'Traveler Tote',
-    price: 195.00,
-    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf7493e.png'
-  },
-  {
-    id: 2,
-    brand: 'Axel Arigato',
-    title: 'Clean 90 Triple Sneakers',
-    price: 245.00,
-    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf74937.png'
-  },
-  {
-    id: 3,
-    brand: 'Axel Arigato',
-    title: 'Clean 90 Triple Sneakers',
-    price: 245.00,
-    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf7493e.png'
-  },
-  {
-    id: 4,
-    brand: 'Axel Arigato',
-    title: 'Clean 90 Triple Sneakers',
-    price: 245.00,
-    imageUrl: 'https://img.js.design/assets/img/60f77157d961d24e3cf74937.png'
-  },
-  // 更多商品...
-]);
+// 查看所有最新商品
+const viewAllLatest = () => {
+  navigateToProductList(router, {
+    type: 'latest'
+  });
+};
 
-// 加载更多商品函数
-const loadMoreProducts = () => {
-  // 实现加载更多商品的逻辑
-  // 例如调用API获取更多商品
+// 查看所有热卖商品
+const viewAllTopSelling = () => {
+  navigateToProductList(router, {
+    type: 'topselling'
+  });
+};
+
+// 加载首页数据
+const loadHomeData = async () => {
+  try {
+    if (loading.value) return;
+
+    loading.value = true;
+    error.value = false;
+
+    // 使用 ProductStore 获取首页数据
+    await productStore.loadHomeData();
+
+
+  } catch (err) {
+    console.error('加载首页数据失败:', err);
+    error.value = true;
+    showToast({ message: '加载失败，请重试', type: 'fail' });
+  } finally {
+    loading.value = false;
+  }
 };
 
 
+// 组件挂载时加载数据
+onMounted(() => {
+  // 如果缓存中没有数据，或者加载状态为false，则加载数据
+  if (!homeData.value || !loading.value) {
+    loadHomeData();
+  }
+});
 
+// 组件被激活时（从其他页面返回时）
+onActivated(() => {
+  isPageActive.value = true;
+
+  // 检查是否需要刷新数据（例如，如果已经过了一定时间）
+  const lastUpdateTime = localStorage.getItem('homeLastUpdate');
+  const now = Date.now();
+
+  if (!lastUpdateTime || (now - parseInt(lastUpdateTime)) > 5 * 60 * 1000) { // 5分钟更新一次
+    loadHomeData();
+    localStorage.setItem('homeLastUpdate', now.toString());
+  }
+});
 </script>
 
 <style scoped>
-.homeTitle {
-  /** 文本1 */
-  font-size: 25px;
-  font-weight: 700;
-  letter-spacing: 0px;
-  line-height: 40px;
-  color: rgba(0, 0, 0, 1);
-}
-
-.homeTitle2 {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0px;
-  line-height: 32px;
-  color: rgba(102, 102, 102, 1);
-}
+/* 样式保持不变 */
 </style>
