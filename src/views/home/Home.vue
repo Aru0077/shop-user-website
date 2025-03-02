@@ -1,34 +1,54 @@
 <template>
-    <div class="pageContent">
-        <div class="px-[5px]">
-          <div class="text-[25px] font-bold leading-4 text-black">Welcome,</div>
-          <div class="text-[20px] font-bold leading-4 text-gray-600">Uni Mall Website</div>
-        </div>
-
-        <!-- 占位容器 -->
-        <div style="height: 18px;"></div>
-
-        <!-- 顶部搜索框 -->
-        <SearchBar placeholder="Search..." v-model:value="searchValue" @search="onSearch" @clear="onClear" />
-
-        <!-- 占位容器 -->
-        <div style="height: 30px;"></div>
-
-        <!-- banner -->
-        <Banner imageUrl="https://img.js.design/assets/img/60f77156d961d24e3cf74934.png" title="30% Off"
-            subtitle="On everything today" description="Updated on 2025-2-3" @banner-click="handleBannerClick"
-            @button-click="handleButtonClick" />
-
-            <!-- 占位容器 -->
-        <div style="height: 30px;"></div>
-
-        <!-- 商品宫格列表 -->
-        <ProductGrid :products="productList" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
-            @click-product="navigateToProductDetail" />
+  <div class="pageContent">
+    <div class="px-[5px]">
+      <div class="text-[25px] font-bold leading-4 text-black">Welcome,</div>
+      <div class="text-[20px] font-bold leading-4 text-gray-600">Uni Mall Website</div>
     </div>
+
+    <!-- 占位容器 -->
+    <div style="height: 18px;"></div>
+
+    <!-- 顶部搜索框 -->
+    <SearchBar placeholder="Search..." v-model:value="searchValue" @search="onSearch" @clear="onClear" />
+
+    <!-- 占位容器 -->
+    <div style="height: 30px;"></div>
+
+    <!-- banner -->
+    <Banner imageUrl="https://img.js.design/assets/img/60f77156d961d24e3cf74934.png" title="30% Off"
+      subtitle="On everything today" description="Updated on 2025-2-3" @banner-click="handleBannerClick"
+      @button-click="handleButtonClick" />
+
+    <!-- 占位容器 -->
+    <div style="height: 30px;"></div>
+
+    <!-- 新品推荐 -->
+    <div class="flex items-end justify-between mb-1.5 mt-1">
+      <div class="text-[18px] font-bold text-black">New Arrivals</div>
+      <div class="text-[11px] text-gray-700">View All</div>
+    </div>
+    <!-- 商品宫格列表 -->
+    <ProductGrid :products="productList" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
+      @click-product="navigateToProductDetail" />
+
+    <!-- 占位容器 -->
+    <div style="height: 30px;"></div>
+
+
+    <!-- 热销商品 -->
+    <div class="flex items-end justify-between mb-1.5 mt-1">
+      <div class="text-[18px] font-bold text-black">New Arrivals</div>
+      <div class="text-[11px] text-gray-700">View All</div>
+    </div>
+    <!-- 商品宫格列表 -->
+    <ProductGrid :products="productList" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
+      @click-product="navigateToProductDetail" />
+
+
+  </div>
 </template>
 
-<script lang="ts" setup> 
+<script lang="ts" setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import SearchBar from '@/components/home/SearchBar.vue';
@@ -54,20 +74,20 @@ const onSearch = (value: string) => {
 
 // 清空搜索框内容
 const onClear = () => {
-    console.log('清空搜索');
-    // 清空搜索相关处理
+  console.log('清空搜索');
+  // 清空搜索相关处理
 };
 
 // 点击banner
 const handleBannerClick = () => {
-    console.log('点击banner');
-    // 清空搜索相关处理
+  console.log('点击banner');
+  // 清空搜索相关处理
 };
 
 // 点击banner 中的按钮
 const handleButtonClick = () => {
-    console.log('点击banner');
-    // 清空搜索相关处理
+  console.log('点击banner');
+  // 清空搜索相关处理
 };
 
 // 商品数据示例
@@ -113,22 +133,21 @@ const loadMoreProducts = () => {
 
 </script>
 
-<style scoped>  
-
+<style scoped>
 .homeTitle {
-    /** 文本1 */
-    font-size: 25px;
-    font-weight: 700;
-    letter-spacing: 0px;
-    line-height: 40px;
-    color: rgba(0, 0, 0, 1);
+  /** 文本1 */
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 0px;
+  line-height: 40px;
+  color: rgba(0, 0, 0, 1);
 }
 
 .homeTitle2 {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0px;
-    line-height: 32px;
-    color: rgba(102, 102, 102, 1);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0px;
+  line-height: 32px;
+  color: rgba(102, 102, 102, 1);
 }
 </style>

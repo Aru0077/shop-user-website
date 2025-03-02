@@ -11,7 +11,7 @@
                         </div>
 
                         <!-- 商品信息 -->
-                        <div class="px-1">
+                        <div class="px-1 flex flex-col items-center">
                               <!-- 品牌名称 -->
                               <div class="text-[14px] font-semibold text-black mb-0.5">{{ product.brand }}</div>
 
