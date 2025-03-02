@@ -52,3 +52,16 @@ if (process.env.NODE_ENV !== 'production') {
 
 // 挂载应用
 app.mount('#app')
+
+// 注册Service Worker (只在生产环境和支持Service Worker的浏览器中)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+      window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                  .then(registration => {
+                        console.log('SW registered: ', registration.scope);
+                  })
+                  .catch(error => {
+                        console.log('SW registration failed: ', error);
+                  });
+      });
+}

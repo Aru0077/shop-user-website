@@ -5,6 +5,10 @@ import 'vant/es/toast/style'
 import 'vant/es/notify/style'
 import router from '@/router'
 
+// 添加以下工具函数实现请求节流
+const throttledRequests = new Map();
+const THROTTLE_DELAY = 300; // 毫秒
+
 // 创建 axios 实例
 const service = axios.create({
       baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -12,7 +16,10 @@ const service = axios.create({
       headers: {
             'Content-Type': 'application/json;charset=utf-8',
       },
-})
+      // HTTP缓存控制
+      // 对GET请求进行缓存控制
+      responseType: 'json',
+});
 
 // 记录正在进行的请求
 const pendingRequests = new Map();
@@ -23,10 +30,17 @@ const getRequestKey = (config: InternalAxiosRequestConfig): string => {
       return `${method}-${url}-${JSON.stringify(params)}-${JSON.stringify(data)}`;
 };
 
-
 // 添加请求
 const addPendingRequest = (config: InternalAxiosRequestConfig) => {
       const requestKey = getRequestKey(config);
+
+      // 如果是GET请求且已在节流期内，直接取消
+      if (config.method?.toLowerCase() === 'get' && throttledRequests.has(requestKey)) {
+            const controller = new AbortController();
+            config.signal = controller.signal;
+            controller.abort('Request throttled');
+            return controller;
+      }
 
       // 如果已有相同请求正在进行，取消它
       if (pendingRequests.has(requestKey)) {
@@ -39,6 +53,14 @@ const addPendingRequest = (config: InternalAxiosRequestConfig) => {
       const controller = new AbortController();
       config.signal = controller.signal;
       pendingRequests.set(requestKey, controller);
+
+      // 设置节流（仅GET请求）
+      if (config.method?.toLowerCase() === 'get') {
+            throttledRequests.set(requestKey, true);
+            setTimeout(() => {
+                  throttledRequests.delete(requestKey);
+            }, THROTTLE_DELAY);
+      }
 
       return controller;
 };
@@ -59,7 +81,15 @@ service.interceptors.request.use(
                         message: '加载中...',
                         forbidClick: true,
                         duration: 0,
-                  })
+                  });
+            }
+
+            // GET请求添加缓存破坏（仅生产环境）
+            if (config.method?.toLowerCase() === 'get' && import.meta.env.PROD) {
+                  config.params = {
+                        ...config.params,
+                        _t: config.params?._t || Date.now()
+                  };
             }
 
             // 添加到正在请求队列

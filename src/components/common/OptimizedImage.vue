@@ -1,8 +1,10 @@
-<!-- src/components/common/OptimizedImage.vue -->
+<!-- 修改 src/components/common/OptimizedImage.vue -->
 <template>
       <div class="optimized-image-wrapper" :class="{ 'fixed-height': fixedHeight }" :style="containerStyle">
             <!-- 加载状态占位符 -->
-            <div v-if="loading" class="image-placeholder"></div>
+            <div v-if="loading" class="image-placeholder">
+                  <div class="loading-pulse"></div>
+            </div>
 
             <!-- 错误状态提示 -->
             <div v-if="error" class="image-error">
@@ -10,13 +12,14 @@
             </div>
 
             <!-- 图片元素 -->
-            <img :src="src" :alt="alt" :class="computedImageClass" @load="handleImageLoaded" @error="handleImageError"
-                  loading="lazy" decoding="async" :fetchpriority="priority" />
+            <img :src="imageSrc" :srcset="generateSrcSet" :alt="alt" :class="computedImageClass"
+                  @load="handleImageLoaded" @error="handleImageError" loading="lazy" decoding="async"
+                  :fetchpriority="priority" />
       </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 // 组件属性定义
 const props = defineProps({
@@ -47,6 +50,10 @@ const props = defineProps({
       fixedHeight: {
             type: Boolean,
             default: false // 是否使用固定高度模式
+      },
+      sizes: {
+            type: String,
+            default: '100vw' // 响应式图片尺寸
       }
 });
 
@@ -54,13 +61,25 @@ const props = defineProps({
 const loading = ref(true);
 const error = ref(false);
 
-// 计算容器样式
+// 计算容器样式，使用will-change提升为合成层
 const containerStyle = computed(() => {
-      if (props.fixedHeight) {
-            return {}; // 固定高度模式不需要设置paddingBottom
-      } else {
-            return { paddingBottom: `${(1 / props.aspectRatio) * 100}%` };
-      }
+      const style = props.fixedHeight
+            ? { willChange: 'transform' }
+            : { paddingBottom: `${(1 / props.aspectRatio) * 100}%`, willChange: 'transform' };
+      return style;
+});
+
+// 使用WebP格式（如果浏览器支持）
+const imageSrc = computed(() => {
+      // 实际项目中应该根据CDN或后端API提供的WebP转换服务来实现
+      return props.src;
+});
+
+// 生成响应式图片srcset
+const generateSrcSet = computed(() => {
+      // 这里应该根据实际的图片服务来生成不同尺寸的图片URL
+      // 示例: `${props.src}?w=480 480w, ${props.src}?w=800 800w`
+      return '';
 });
 
 // 计算图片类名
@@ -80,13 +99,15 @@ const handleImageError = () => {
       error.value = true;
 };
 
-// 预加载处理在onMounted时进行
-if (props.priority === 'high') {
-      const preloadImage = new Image();
-      preloadImage.src = props.src;
-      preloadImage.onload = handleImageLoaded;
-      preloadImage.onerror = handleImageError;
-}
+// 高优先级图片预加载
+onMounted(() => {
+      if (props.priority === 'high') {
+            const preloadImage = new Image();
+            preloadImage.src = props.src;
+            preloadImage.onload = handleImageLoaded;
+            preloadImage.onerror = handleImageError;
+      }
+});
 </script>
 
 <style scoped>
@@ -94,14 +115,13 @@ if (props.priority === 'high') {
       position: relative;
       width: 100%;
       height: 0;
-      /* 默认高度为0，由paddingBottom控制实际高度 */
       overflow: hidden;
+      transform: translateZ(0);
+      /* 创建硬件加速层 */
 }
 
-/* 固定高度模式样式 */
-.optimized-image-wrapper.fixed-height {
+.fixed-height {
       height: 100%;
-      /* 使用父容器的100%高度 */
 }
 
 .image-placeholder {
@@ -111,6 +131,34 @@ if (props.priority === 'high') {
       width: 100%;
       height: 100%;
       background-color: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+
+.loading-pulse {
+      width: 30%;
+      height: 30%;
+      background-color: #e5e7eb;
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+      0% {
+            opacity: 0.3;
+            transform: scale(0.8);
+      }
+
+      50% {
+            opacity: 0.5;
+            transform: scale(1);
+      }
+
+      100% {
+            opacity: 0.3;
+            transform: scale(0.8);
+      }
 }
 
 .image-error {
@@ -133,9 +181,9 @@ img {
       left: 0;
       width: 100%;
       height: 100%;
+      transition: opacity 0.2s ease-in-out;
 }
 
-/* 对象适应方式类 */
 .object-cover {
       object-fit: cover;
 }
