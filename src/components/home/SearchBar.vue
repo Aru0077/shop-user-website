@@ -31,9 +31,8 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, defineEmits, defineProps, watch } from 'vue';
+  import { ref, watch } from 'vue';
   import { Search, X } from 'lucide-vue-next'
-  import { Icon } from 'vant';
   
   // 定义属性
   const props = defineProps({

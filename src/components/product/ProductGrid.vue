@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, withDefaults } from 'vue';
 import OptimizedImage from '@/components/common/OptimizedImage.vue';
 
 // 定义商品类型

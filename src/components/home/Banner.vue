@@ -30,7 +30,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import OptimizedImage from '@/components/common/OptimizedImage.vue';
 
 // 定义属性
