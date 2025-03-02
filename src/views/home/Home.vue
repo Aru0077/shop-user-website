@@ -1,8 +1,8 @@
 <template>
     <div class="pageContent">
         <div class="px-[5px]">
-            <div class="homeTitle">Welcome,</div>
-            <div class="homeTitle2">Uni Mall Website</div>
+          <div class="text-[25px] font-bold leading-4 text-black">Welcome,</div>
+          <div class="text-[20px] font-bold leading-4 text-gray-600">Uni Mall Website</div>
         </div>
 
         <!-- 占位容器 -->
@@ -112,17 +112,7 @@ const navigateToProductDetail = (product) => {
 
 </script>
 
-<style scoped>
-.spacing {
-    height: 20px;
-}
-
-.homeLogo {
-    color: #fff;
-    background-color: #000;
-    padding: 10px;
-    border-radius: 50%;
-}
+<style scoped>  
 
 .homeTitle {
     /** 文本1 */

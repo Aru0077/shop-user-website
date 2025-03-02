@@ -2,7 +2,7 @@
 <template>
   <div id="app" class="w-screen h-screen overflow-hidden flex flex-col">
     <!-- 顶部导航栏 - 固定高度 -->
-    <div class="w-full z-20 flex-shrink-0">
+    <div class="w-full z-20 flex-shrink-0 mt-1">
       <nav-bar v-if="navBarConfig.show" :left-btn="navBarConfig.leftBtn" :right-btn="navBarConfig.rightBtn"
         :show-background="navBarConfig.showBackground" />
     </div>

@@ -5,6 +5,7 @@ import { login as loginApi, logout as logoutApi, deleteAccount as deleteAccountA
 import { UserInfo, LoginParams, DeleteAccountParams } from '@/types/user.type';
 import { saveTokens, getAccessToken, clearTokens } from '@/utils/tokenManager';
 import storage from '@/utils/storage';
+import { useFavoriteStore } from '@/store/favorite.store'
 
 // 本地存储键名定义
 const USER_INFO_KEY = 'USER_INFO';
@@ -60,6 +61,11 @@ export const useUserStore = defineStore('user', () => {
         try {
             await logoutApi();
             clearUserInfo();
+
+            // 清空收藏数据（需要先导入）
+        const favoriteStore = useFavoriteStore();
+        favoriteStore.clearFavorites();
+
             return Promise.resolve(true);
         } catch (error) {
             // 即使API调用失败，也清除本地信息

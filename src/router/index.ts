@@ -46,7 +46,8 @@ const routes: Array<RouteRecordRaw> = [
                   title: 'UniMall - Category',
                   keepAlive: true,
                   navBar: {
-                        show: false,
+                        show: true,
+                        leftBtn: 'category',
                   },
                   tabBar: {
                         show: true
@@ -59,10 +60,11 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/cart/Cart.vue'),
             meta: {
                   title: 'UniMall - Cart',
-                  auth: true, // 购物车需要登录
+                  auth: true, // 购物车需要登录 
                   keepAlive: true,
                   navBar: {
-                        show: false,
+                        show: true,
+                        leftBtn: 'cart',
                   },
                   tabBar: {
                         show: true
@@ -78,7 +80,8 @@ const routes: Array<RouteRecordRaw> = [
                   auth: true, // 用户中心需要登录
                   keepAlive: true,
                   navBar: {
-                        show: false,
+                        show: true,
+                        leftBtn: 'user',
                   },
                   tabBar: {
                         show: true

@@ -4,21 +4,37 @@
             :class="{ 'bg-white backdrop-blur-md shadow-sm': showBackground, 'bg-transparent': !showBackground }">
             <!-- 左侧按钮 -->
             <div class="flex items-center">
+
                   <template v-if="leftBtn === 'back'">
-                        <ChevronLeft @click="handleLeftClick('back')"
-                              class="bg-black text-white p-1 rounded-full w-2 h-2 flex items-center justify-center cursor-pointer" />
+                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                              <ChevronLeft @click="handleLeftClick('back')"/>
+                        </div>
                   </template>
+
                   <template v-else-if="leftBtn === 'home'">
-                        <Home @click="handleLeftClick('home')"
-                              class="bg-black text-white p-1 rounded-full w-2 h-2 flex items-center justify-center cursor-pointer" />
+                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                              <Home @click="handleLeftClick('home')"/>
+                        </div> 
                   </template>
-                  <template v-else-if="leftBtn === 'close'">
-                        <X  @click="handleLeftClick('close')"
-                              class="bg-black text-white p-1 rounded-full w-2 h-2 flex items-center justify-center cursor-pointer" />
+
+                  <template v-else-if="leftBtn === 'category'">
+                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                              <LayoutGrid @click="handleLeftClick('close')"/>
+                        </div> 
                   </template>
-                  <template v-else-if="leftBtn === 'custom'">
-                        <slot name="left"></slot>
+
+                  <template v-else-if="leftBtn === 'cart'">
+                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                              <ShoppingCart @click="handleLeftClick('close')"/>
+                        </div> 
                   </template>
+
+                  <template v-else-if="leftBtn === 'user'">
+                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                              <User @click="handleLeftClick('close')"/>
+                        </div> 
+                  </template>
+
             </div>
 
             <!-- 右侧按钮 -->
@@ -50,7 +66,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { Home, X, MoreHorizontal, Search, Share2, ChevronLeft } from 'lucide-vue-next'
+import { Home, X, MoreHorizontal, Search, Share2, ChevronLeft, LayoutGrid, ShoppingCart, User } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
 // 定义属性
@@ -61,7 +77,7 @@ defineProps({
       },
       leftBtn: {
             type: String,
-            default: 'back' // 'back', 'home', 'close', 'custom', 'none'
+            default: 'back' // 'back', 'home', 'category', 'cart', 'user'
       },
       rightBtn: {
             type: String,
@@ -82,7 +98,7 @@ const router = useRouter()
 const handleLeftClick = (type) => {
       // 先触发事件，允许父组件捕获并可能阻止默认行为
       emit('left-click', { type, preventDefault: false })
-      
+
       // 执行默认行为
       if (type === 'back' || type === 'close') {
             router.back()
