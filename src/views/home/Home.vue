@@ -34,6 +34,7 @@ import { useRouter } from 'vue-router';
 import SearchBar from '@/components/home/SearchBar.vue';
 import Banner from '@/components/home/Banner.vue';
 import ProductGrid from '@/components/product/ProductGrid.vue';
+import { navigateToProductList, navigateToProductDetail } from '@/utils/navigation';
 
 const router = useRouter()
 const hasMoreProducts = ref(true);
@@ -42,9 +43,13 @@ const hasMoreProducts = ref(true);
 const searchValue = ref('');
 
 // 搜索按钮点击事件
-const onSearch = (value) => {
-    console.log('搜索内容:', value);
-    // 这里可以添加搜索逻辑，如跳转到搜索结果页或调用搜索API
+const onSearch = (value: string) => {
+  if (value.trim()) {
+    navigateToProductList(router, {
+      type: 'search',
+      keyword: value.trim()
+    });
+  }
 };
 
 // 清空搜索框内容
@@ -104,10 +109,6 @@ const loadMoreProducts = () => {
   // 例如调用API获取更多商品
 };
 
-// 点击商品跳转到详情页
-const navigateToProductDetail = (product) => {
-  router.push(`/product/detail/${product.id}`);
-};
 
 
 </script>

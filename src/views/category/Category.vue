@@ -14,7 +14,7 @@
                 :name="category.id">
                 <div class="subcategory-container">
                     <div v-for="subCategory in getCategoryChildren(category)" :key="subCategory.id"
-                        class="subcategory-item" @click="navigateToProductList(subCategory)">
+                        class="subcategory-item" @click="handleCategoryClick(subCategory)">
                         <span class="subcategory-text">{{ subCategory.name }}</span>
                     </div>
                 </div>
@@ -29,6 +29,7 @@ import { useRouter } from 'vue-router';
 import { showToast } from 'vant';
 import { useProductStore } from '@/store/product.store';
 import type { Category } from '@/types/product.type';
+import { navigateToProductList } from '@/utils/navigation';
 
 const router = useRouter();
 const productStore = useProductStore();
@@ -43,6 +44,14 @@ const getCategoryChildren = (category: Category) => {
     return category.children || [];
 };
 
+// 处理分类点击，使用工具函数进行导航
+const handleCategoryClick = (category: Category) => {
+    navigateToProductList(router, {
+        type: 'category',
+        id: category.id
+    });
+};
+
 // 加载分类树数据
 const loadCategoryData = async () => {
     try {
@@ -54,15 +63,6 @@ const loadCategoryData = async () => {
     } finally {
         loading.value = false;
     }
-};
-
-// 跳转到商品列表页（预留方法）
-const navigateToProductList = (category: Category) => {
-    console.log('Navigate to category products:', category.id);
-    router.push({
-        path: '/product/list',
-        query: { type: 'category', id: category.id }
-    });
 };
 
 // 页面加载时获取分类数据

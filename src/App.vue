@@ -10,7 +10,7 @@
     <!-- 中间内容区域 - 可滚动，占据剩余空间 -->
     <div class="flex-1 overflow-auto relative">
       <router-view v-slot="{ Component }">
-        <keep-alive>
+        <keep-alive :include="['Home', 'Category', 'Cart', 'User']">
           <component :is="Component" />
         </keep-alive>
       </router-view>
