@@ -74,9 +74,10 @@ const tabItems = [
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: all 0.3s ease;
+      transition: all 0.15s ease;
       overflow: hidden;
-      z-index: 1; /* 确保图标在黑色背景上方 */
+      z-index: 1;
+      will-change: transform; /* 告知浏览器此元素将变化，启用GPU加速 */
 }
 
 .icon-wrapper::after {
@@ -89,8 +90,9 @@ const tabItems = [
       background-color: #000;
       border-radius: 50%;
       transform: translate(-50%, -50%);
-      transition: width 0.3s ease, height 0.3s ease;
+      transition: width 0.15s ease, height 0.15s ease;
       z-index: -1;
+      will-change: width, height; /* 优化渲染 */
 }
 
 .tabbar-item.active .icon-wrapper::after {

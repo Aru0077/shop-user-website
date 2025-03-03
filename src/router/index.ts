@@ -355,6 +355,8 @@ router.beforeEach((to, from, next) => {
       const userStore = useUserStore();
       const isLoggedIn = userStore.getIsLoggedIn;
 
+      
+
       // 简化登录判断逻辑
       if (whiteList.some(path => to.path.startsWith(path))) {
             // 白名单路径直接放行

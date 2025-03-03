@@ -54,20 +54,32 @@ const handleCategoryClick = (category: Category) => {
 
 // 加载分类树数据
 const loadCategoryData = async () => {
-    try {
-        loading.value = true;
-        await productStore.loadCategoryTree();
-    } catch (error) {
-        console.error('Failed to load categories:', error);
-        showToast('分类加载失败，请重试');
-    } finally {
-        loading.value = false;
+  try {
+    // 如果分类数据已存在且不为空，不再重新加载
+    if (categories.value.length > 0 && !loading.value) {
+      loading.value = false;
+      return;
     }
+    
+    loading.value = true;
+    // 不强制刷新，优先使用缓存数据
+    await productStore.loadCategoryTree(false);
+  } catch (error) {
+    console.error('Failed to load categories:', error);
+    showToast('分类加载失败，请重试');
+  } finally {
+    loading.value = false;
+  }
 };
 
 // 页面加载时获取分类数据
 onMounted(() => {
+  // 如果分类数据已预加载，直接使用
+  if (categories.value.length > 0) {
+    loading.value = false;
+  } else {
     loadCategoryData();
+  }
 });
 </script>
 

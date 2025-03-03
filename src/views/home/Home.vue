@@ -158,9 +158,8 @@ const loadHomeData = async () => {
     loading.value = true;
     error.value = false;
 
-    // 使用 ProductStore 获取首页数据
-    await productStore.loadHomeData();
-
+    // 使用ProductStore获取首页数据，不强制刷新，会优先使用缓存
+    await productStore.loadHomeData(false);
 
   } catch (err) {
     console.error('加载首页数据失败:', err);
@@ -174,8 +173,10 @@ const loadHomeData = async () => {
 
 // 组件挂载时加载数据
 onMounted(() => {
-  // 如果缓存中没有数据，或者加载状态为false，则加载数据
-  if (!homeData.value || !loading.value) {
+  // 如果预加载数据已存在，直接使用，不重新加载
+  if (homeData.value) {
+    loading.value = false;
+  } else {
     loadHomeData();
   }
 });
@@ -183,12 +184,12 @@ onMounted(() => {
 // 组件被激活时（从其他页面返回时）
 onActivated(() => {
   isPageActive.value = true;
-
-  // 检查是否需要刷新数据（例如，如果已经过了一定时间）
+  // 检查是否需要刷新数据，延长到30分钟
   const lastUpdateTime = localStorage.getItem('homeLastUpdate');
   const now = Date.now();
 
-  if (!lastUpdateTime || (now - parseInt(lastUpdateTime)) > 5 * 60 * 1000) { // 5分钟更新一次
+  // 只有超过30分钟才刷新数据
+  if (!homeData.value || (!lastUpdateTime || (now - parseInt(lastUpdateTime)) > 30 * 60 * 1000)) {
     loadHomeData();
     localStorage.setItem('homeLastUpdate', now.toString());
   }

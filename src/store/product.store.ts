@@ -23,6 +23,23 @@ import storage from '@/utils/storage';
 
 // 商品Store - 使用组合式API写法
 export const useProductStore = defineStore('product', () => {
+
+      // 缓存键
+      const CACHE_KEYS = {
+            HOME_DATA: 'product_home_data',
+            CATEGORY_TREE: 'product_category_tree',
+            PRODUCT_LIST: 'product_list_',
+            PRODUCT_DETAIL: 'product_detail_'
+      };
+
+      // 缓存时间（秒）
+      const CACHE_EXPIRY = {
+            HOME_DATA: 60 * 30,        // 30分钟
+            CATEGORY_TREE: 60 * 60 * 24, // 24小时
+            PRODUCT_LIST: 60 * 15,      // 15分钟
+            PRODUCT_DETAIL: 60 * 60     // 1小时
+      };
+
       // 状态
       const categories = ref<Category[]>([]);
       const homeData = ref<HomeData | null>(null);
@@ -32,6 +49,24 @@ export const useProductStore = defineStore('product', () => {
       const currentCategory = ref<Category | null>(null);
       const categoryProducts = ref<Product[]>([]);
       const currentProduct = ref<ProductDetail | null>(null);
+
+      // 添加预加载方法
+      async function preloadCoreData() {
+            console.log('预加载商品核心数据...');
+            try {
+                  // 并行加载首页数据和分类树
+                  await Promise.all([
+                        loadHomeData(false),
+                        loadCategoryTree(false)
+                  ]);
+                  return true;
+            } catch (error) {
+                  console.error('预加载商品数据失败:', error);
+                  return false;
+            }
+      }
+
+
 
       // 添加请求防抖控制
       let homeDataTimer: NodeJS.Timeout | null = null;
@@ -66,14 +101,31 @@ export const useProductStore = defineStore('product', () => {
       });
 
       // 方法: 加载分类树
-      async function loadCategoryTree() {
-            if (categories.value.length > 0) return categories.value;
+      async function loadCategoryTree(force = false) {
+            // 已有数据且非强制刷新，直接返回
+            if (categories.value.length > 0 && !force) {
+                  return categories.value;
+            }
+
+            // 尝试从缓存获取
+            if (!force) {
+                  const cachedData = storage.get(CACHE_KEYS.CATEGORY_TREE);
+                  if (cachedData && cachedData.length > 0) {
+                        categories.value = cachedData;
+                        return cachedData;
+                  }
+            }
 
             try {
                   loading.value = true;
                   const res = await getCategoryTree();
                   categories.value = res.data;
+
+                  // 存入缓存
+                  storage.set(CACHE_KEYS.CATEGORY_TREE, res.data, CACHE_EXPIRY.CATEGORY_TREE);
+
                   return categories.value;
+
             } catch (error) {
                   console.error('Failed to load category tree:', error);
                   return [];
@@ -84,33 +136,36 @@ export const useProductStore = defineStore('product', () => {
 
       // 方法: 加载首页数据
       async function loadHomeData(force = false) {
-            // 如果已有数据且非强制刷新，返回缓存数据
+            // 已有数据且非强制刷新，直接返回
             if (homeData.value && !force) {
                   return homeData.value;
             }
 
-            // 防抖处理，防止短时间内多次请求
-            if (homeDataTimer) clearTimeout(homeDataTimer);
+            // 尝试从缓存获取
+            if (!force) {
+                  const cachedData = storage.get(CACHE_KEYS.HOME_DATA);
+                  if (cachedData) {
+                        homeData.value = cachedData;
+                        return cachedData;
+                  }
+            }
 
-            return new Promise((resolve) => {
-                  homeDataTimer = setTimeout(async () => {
-                        try {
-                              loading.value = true;
-                              const res = await getHomeDataApi();
-                              homeData.value = res.data;
+            try {
+                  loading.value = true;
+                  const res = await getHomeDataApi();
+                  homeData.value = res.data;
 
-                              // 缓存最后更新时间
-                              localStorage.setItem('homeLastUpdate', Date.now().toString());
+                  // 存入缓存
+                  storage.set(CACHE_KEYS.HOME_DATA, res.data, CACHE_EXPIRY.HOME_DATA);
 
-                              resolve(homeData.value);
-                        } catch (error) {
-                              console.error('Failed to load home data:', error);
-                              resolve(null);
-                        } finally {
-                              loading.value = false;
-                        }
-                  }, 100);
-            });
+                  return homeData.value;
+            } catch (error) {
+                  console.error('Failed to load home data:', error);
+                  return null;
+            } finally {
+                  loading.value = false;
+            }
+
       }
 
       // 方法: 加载最新商品
@@ -203,10 +258,21 @@ export const useProductStore = defineStore('product', () => {
 
       // 方法: 加载商品详情
       async function loadProductDetail(id: number) {
+            const cacheKey = `${CACHE_KEYS.PRODUCT_DETAIL}${id}`;
+
+            // 尝试从缓存获取
+            const cachedData = storage.get(cacheKey);
+            if (cachedData) {
+                  currentProduct.value = cachedData;
+                  return cachedData;
+            }
+
             try {
                   loading.value = true;
                   const res = await getProductDetail(id);
                   currentProduct.value = res.data;
+                  // 存入缓存
+                  storage.set(cacheKey, res.data, CACHE_EXPIRY.PRODUCT_DETAIL);
                   return currentProduct.value;
             } catch (error) {
                   console.error('Failed to load product detail:', error);
@@ -238,9 +304,21 @@ export const useProductStore = defineStore('product', () => {
             } = {}
       ) {
             // 设置默认分页参数
-            const page = params.page || 1;
-            const limit = params.limit || 10;
-            const sort = params.sort || ProductSortType.NEWEST;
+            const { page = 1, limit = 10 } = params;
+
+            // 仅对第一页尝试使用缓存
+            const useCache = page === 1;
+
+            // 构建缓存键
+            const cacheKey = `${CACHE_KEYS.PRODUCT_LIST}${type}_${params.id || ''}_${params.keyword || ''}_${params.sort || ''}`;
+
+            // 尝试从缓存获取
+            if (useCache) {
+                  const cachedData = storage.get(cacheKey);
+                  if (cachedData) {
+                        return cachedData;
+                  }
+            }
 
             try {
                   loading.value = true;
@@ -253,7 +331,6 @@ export const useProductStore = defineStore('product', () => {
                                           Number(params.id),
                                           page,
                                           limit,
-                                          sort
                                     );
                               }
                               break;
@@ -278,6 +355,11 @@ export const useProductStore = defineStore('product', () => {
                         default:
                               result = await loadLatestProducts(page, limit);
                               break;
+                  }
+
+                  // 仅缓存第一页数据
+                  if (useCache && result.length > 0) {
+                        storage.set(cacheKey, result, CACHE_EXPIRY.PRODUCT_LIST);
                   }
 
                   return result;
@@ -321,7 +403,8 @@ export const useProductStore = defineStore('product', () => {
             loadCategoryProducts,
             loadProductDetail,
             clearCurrentProduct,
-            loadProductsByType
+            loadProductsByType,
+            preloadCoreData
       };
 }, {
       persist: true  // 添加持久化配置

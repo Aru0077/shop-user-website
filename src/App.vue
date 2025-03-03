@@ -96,6 +96,19 @@ onMounted(() => {
     document.body.classList.add('reduce-animations');
   }
 
+  const setupPerformanceOptimizations = () => {
+    // 获取优化级别
+    if (optimizationLevel.value === 'high') {
+      // 针对高优化（低性能设备）完全禁用过渡动画
+      document.body.classList.add('disable-animations');
+    } else if (optimizationLevel.value === 'medium') {
+      // 针对中等优化级别减少动画时间
+      document.body.classList.add('reduce-animations');
+    }
+  };
+
+  // 调用此函数
+  setupPerformanceOptimizations();
 
 });
 
@@ -117,5 +130,17 @@ onBeforeUnmount(() => {
 .reduce-animations .slide-right-enter-active,
 .reduce-animations .slide-right-leave-active {
   transition: all 0.15s linear;
+}
+
+.disable-animations .fade-enter-active,
+.disable-animations .fade-leave-active,
+.disable-animations .slide-right-enter-active,
+.disable-animations .slide-right-leave-active {
+  transition: none !important;
+}
+
+.disable-animations .icon-wrapper,
+.disable-animations .icon-wrapper::after {
+  transition: none !important;
 }
 </style>

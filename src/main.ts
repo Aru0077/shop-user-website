@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import { Lazyload } from 'vant';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { Icon } from "@iconify/vue";
+import { useProductStore } from './store/product.store';
 
 // 导入全局样式
 import './assets/styles/tailwind.css'
@@ -51,6 +52,14 @@ if (process.env.NODE_ENV !== 'production') {
 
 // 挂载应用
 app.mount('#app')
+
+// 立即创建 store 实例并预加载数据
+setTimeout(() => {
+      const productStore = useProductStore();
+      productStore.preloadCoreData().then(() => {
+            console.log('核心数据预加载完成');
+      });
+}, 100);
 
 // 注册Service Worker (只在生产环境和支持Service Worker的浏览器中)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
