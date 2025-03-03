@@ -7,7 +7,7 @@ import router from '@/router'
 
 // 添加以下工具函数实现请求节流
 const throttledRequests = new Map();
-const THROTTLE_DELAY = 300; // 毫秒
+const THROTTLE_DELAY = 150; // 毫秒
 
 // 创建 axios 实例
 const service = axios.create({
