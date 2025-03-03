@@ -308,9 +308,10 @@ const routes: Array<RouteRecordRaw> = [
             meta: {
                   title: 'UniMall - ProductDetail',
                   navBar: {
-                        show: true,
+                        show: false,
                         leftBtn: 'back',
-                        rightBtn: 'share'
+                        rightBtn: 'share',
+                        showBackground:false,
                   },
                   tabBar: {
                         show: false

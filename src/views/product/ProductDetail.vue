@@ -1,139 +1,47 @@
 <!-- src/views/product/ProductDetail.vue -->
 <template>
-    <div class="product-detail">
-        <!-- Product Gallery Section -->
-        <div class="product-gallery">
-            <van-image v-if="productDetail && productDetail.mainImage" :src="productDetail.mainImage" fit="cover"
-                class="w-full h-full rounded-lg" />
-            <div v-else class="placeholder-image w-full h-64 bg-gray-100 flex items-center justify-center rounded-lg">
-                <van-loading type="spinner" size="24px" v-if="loading" />
-                <span v-else class="text-gray-500">商品图片加载失败</span>
-            </div>
+    <div class="relative w-full overflow-hidden h-screen">
 
-            <!-- Additional Images Gallery (if available) -->
-            <div v-if="productDetail && productDetail.detailImages"
-                class="additional-images mt-2 grid grid-cols-4 gap-2">
-                <div v-for="(image, index) in processedDetailImages" :key="index"
-                    class="h-20 w-full bg-gray-100 rounded-md overflow-hidden">
-                    <van-image :src="image" fit="cover" class="w-full h-full" />
+        <!-- 顶部 Navbar -->
+        <div class="fixed top-0 left-0 right-0 w-full h-[60px] bg-transparent z-50">
+            <div class="nav-bar flex items-center justify-between box-border h-[60px] px-2 w-full">
+                <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                    <ChevronLeft />
+                </div>
+                <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                    <Share2 />
                 </div>
             </div>
         </div>
 
-        <!-- Product Info Section -->
-        <div class="product-info card my-3 p-4 rounded-lg shadow-sm">
-            <!-- Loading State -->
-            <van-loading v-if="loading" type="spinner" size="24px" class="my-4 flex justify-center" />
-
-            <!-- Product Not Found -->
-            <van-empty v-else-if="!productDetail" description="商品不存在或已下架" />
-
-            <!-- Product Information -->
-            <template v-else>
-                <!-- Product Name -->
-                <h1 class="text-xl font-bold mb-1">{{ productDetail.name }}</h1>
-
-                <!-- Product Code -->
-                <div class="text-gray-500 text-sm mb-2">
-                    商品编码: {{ productDetail.productCode || '暂无' }}
-                </div>
-
-                <!-- Product Price -->
-                <div class="price-container flex items-center mb-3 mt-2">
-                    <span class="text-2xl font-bold text-red-500">{{ formatPrice(displayPrice) }}</span>
-                    <span v-if="hasPromotion" class="ml-2 text-sm line-through text-gray-500">
-                        {{ formatPrice(originalPrice) }}
-                    </span>
-                </div>
-
-                <!-- Product Stock -->
-                <div class="stock-info text-sm text-gray-600 mb-3">
-                    库存: {{ availableStock }} 件
-                </div>
-
-                <!-- Specs Selection -->
-                <div v-if="productDetail.specs && productDetail.specs.length > 0" class="specs-container mb-4">
-                    <div v-for="spec in productDetail.specs" :key="spec.id" class="spec-group mb-3">
-                        <div class="spec-title text-gray-700 mb-2">{{ spec.name }}</div>
-                        <div class="spec-options flex flex-wrap gap-2">
-                            <span v-for="value in spec.values" :key="value.id"
-                                class="spec-option px-3 py-1 border rounded-full text-sm"
-                                :class="selectedSpecs[spec.id] === value.id ? 'border-primary text-primary bg-primary-light' : 'border-gray-300'"
-                                @click="selectSpec(spec.id, value.id)">
-                                {{ value.value }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quantity Selector -->
-                <div class="quantity-container flex items-center justify-between mb-4 bg-gray-50 p-3 rounded-lg">
-                    <span class="text-gray-700">购买数量</span>
-                    <div class="flex items-center">
-                        <van-button icon="minus" size="small" class="h-8 w-8 flex items-center justify-center"
-                            :disabled="quantity <= 1" @click="quantity > 1 && quantity--" />
-                        <span class="mx-4 text-lg min-w-8 text-center">{{ quantity }}</span>
-                        <van-button icon="plus" size="small" class="h-8 w-8 flex items-center justify-center"
-                            :disabled="quantity >= availableStock" @click="quantity < availableStock && quantity++" />
-                    </div>
-                </div>
-            </template>
-        </div>
-
-        <!-- Product Details Section -->
-        <div v-if="productDetail && !loading" class="product-details card p-4 rounded-lg shadow-sm">
-            <h2 class="text-lg font-bold mb-3 pb-2 border-b border-gray-100">商品详情</h2>
-
-            <!-- Category -->
-            <div class="detail-item flex justify-between py-2 border-b border-gray-50">
-                <span class="text-gray-500">分类</span>
-                <span>{{ categoryName }}</span>
+        <!-- 上下滚动内容区 -->
+        <div class="absolute top-0 left-0 right-0 overflow-y-auto h-full">
+            <!-- 主图 -->
+            <div class=" z-10 relative">
+                <van-image v-if="productDetail && productDetail.mainImage" :src="productDetail.mainImage" fit="cover"
+                    class="w-full aspect-square rounded-lg" />
             </div>
 
-            <!-- Sales Count -->
-            <div class="detail-item flex justify-between py-2 border-b border-gray-50">
-                <span class="text-gray-500">销量</span>
-                <span>{{ productDetail.salesCount || 0 }}</span>
-            </div>
+            <!-- 详情内容 -->
+            <div v-if="productDetail"
+                class="absolute w-full h-auto bg-white -mt-2 z-20 rounded-t-lg py-2 px-2 box-border">
+                <div class="text-[20px] font-bold">{{ productDetail.name }}</div>
 
-            <!-- Content -->
-            <div class="content-section mt-4">
-                <div class="content text-gray-700" v-html="productDetail.content || '暂无详细描述'"></div>
-            </div>
+                <!-- SKU选择组件 -->
+                <SkuSelector v-if="productDetail.specs && productDetail.skus" :specs="productDetail.specs"
+                    :skus="productDetail.skus" v-model:selection="selectedSpecs" @sku-change="handleSkuChange" />
 
-            <!-- Detail Images -->
-            <div v-if="productDetail.detailImages" class="detail-images mt-4">
-                <van-image v-for="(image, index) in processedDetailImages" :key="`detail-${index}`" :src="image"
-                    fit="cover" class="w-full mb-2 rounded" />
             </div>
         </div>
 
-        <!-- Bottom Action Bar -->
-        <div v-if="productDetail"
-            class="action-bar fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex items-center justify-between safe-area-bottom z-50">
-            <div class="action-icons flex space-x-4 px-4">
-                <div class="flex flex-col items-center justify-center py-2" @click="toggleFavorite">
-                    <van-icon :name="isFavorited ? 'star' : 'star-o'" :color="isFavorited ? '#f2994a' : '#333'"
-                        size="24" />
-                    <span class="text-xs mt-1">收藏</span>
-                </div>
-                <div class="flex flex-col items-center justify-center py-2" @click="goToCart">
-                    <van-icon name="cart-o" size="24" />
-                    <span class="text-xs mt-1">购物车</span>
-                </div>
-            </div>
-            <div class="action-buttons flex p-2">
-                <van-button type="warning" block class="mr-2" @click="addToCart">加入购物车</van-button>
-                <van-button type="danger" block @click="buyNow">立即购买</van-button>
-            </div>
-        </div>
 
-        <!-- Spacer for Bottom Bar -->
-        <div class="h-16"></div>
+
     </div>
+
 </template>
 
 <script setup lang="ts">
+import { Share2, ChevronLeft } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { showToast, showSuccessToast } from 'vant';
@@ -142,6 +50,7 @@ import { useFavoriteStore } from '@/store/favorite.store';
 import { useUserStore } from '@/store/user.store';
 import { formatPrice } from '@/utils/formatPrice';
 import type { ProductDetail as ProductDetailType, Sku } from '@/types/product.type';
+import SkuSelector from '@/components/product/SkuSelector.vue';
 
 // Initialize
 const route = useRoute();
@@ -157,6 +66,12 @@ const productDetail = computed(() => productStore.currentProduct);
 const quantity = ref(1);
 const selectedSpecs = ref<Record<number, number>>({});
 const isFavorited = computed(() => favoriteStore.isProductFavorited(productId.value));
+
+// 处理SKU变更
+const handleSkuChange = (sku) => {
+  console.log('选中的SKU:', sku);
+  // 更新价格、库存等信息
+};
 
 // Process detail images
 const processedDetailImages = computed(() => {
@@ -322,12 +237,20 @@ const goToCart = () => {
 };
 
 // Load product detail
-const loadProductDetail = async () => {
+// 加载商品详情
+const loadProductDetail = async (forceRefresh = false) => {
     try {
         loading.value = true;
+
+        // 判断是否已有数据且无需强制刷新
+        if (!forceRefresh && productDetail.value && productDetail.value.id === productId.value) {
+            loading.value = false;
+            return;
+        }
+
         await productStore.loadProductDetail(productId.value);
 
-        // Initialize spec selection
+        // 初始化规格选择
         if (productDetail.value && productDetail.value.specs) {
             productDetail.value.specs.forEach(spec => {
                 if (spec.values && spec.values.length > 0) {
@@ -353,9 +276,9 @@ watch(() => productId.value, (newVal, oldVal) => {
 // Lifecycle hooks
 onMounted(() => {
     document.title = '商品详情';
-    loadProductDetail();
+    loadProductDetail(false); // 默认不强制刷新，优先使用缓存
 
-    // Initialize favorite status
+    // 初始化收藏状态
     if (userStore.isLoggedIn) {
         favoriteStore.loadFavorites();
     }
@@ -367,55 +290,85 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.nav-bar {
+    /* 处理iOS安全区 */
+    padding-top: env(safe-area-inset-top);
+}
+
+
+
+
+
 .product-detail {
-    /* padding-bottom: 60px; */
-margin-top: -70px;
+    padding-bottom: 10px;
 }
 
 .product-gallery {
     width: 100%;
     background-color: white;
     overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
-.card {
-    background: white;
-}
-
-/* Primary color */
-.text-primary {
-    color: #ee0a24;
-}
-
-.bg-primary-light {
-    background-color: rgba(238, 10, 36, 0.05);
-}
-
-.border-primary {
-    border-color: #ee0a24;
-}
-
-/* Spec selection */
+/* 规格选择样式 */
 .spec-option {
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
 .spec-option:active {
     transform: scale(0.98);
 }
 
-/* Product description */
-.product-description .content {
-    line-height: 1.6;
+/* 操作按钮 */
+.action-buttons button {
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Action bar */
-.action-bar {
-    z-index: 100;
+.action-buttons button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
 }
 
-.action-buttons {
-    flex: 1;
+/* 自定义数量控制按钮样式 */
+.quantity-controls button {
+    transition: all 0.2s;
+}
+
+.quantity-controls button:active {
+    transform: scale(0.95);
+    background-color: #f5f5f5;
+}
+
+.quantity-controls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 商品内容样式 */
+.content {
+    line-height: 1.8;
+}
+
+.content img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+/* 动画效果 */
+.info-card,
+.detail-card {
+    transition: transform 0.3s ease;
+}
+
+/* 详情图片间距 */
+.detail-images {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 </style>
