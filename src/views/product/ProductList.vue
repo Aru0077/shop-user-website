@@ -4,14 +4,18 @@
         <div class="px-[5px]">
             <div class="text-[25px] font-bold leading-4 text-black">{{ pageTitle }}</div>
         </div>
+
+        <!-- 占位容器 -->
+        <div style="height: 18px;"></div>
+
         <!-- 加载状态 -->
         <van-loading v-if="loading" type="spinner" size="24px" class="my-4 flex justify-center" />
 
         <!-- 空状态 -->
-        <van-empty v-else-if="products.length === 0" description="暂无商品" />
+        <van-empty v-else-if="formattedProducts.length === 0" description="暂无商品" />
 
         <!-- 商品列表 -->
-        <ProductGrid v-else :products="products" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
+        <ProductGrid v-else :products="formattedProducts" :showLoadMore="hasMoreProducts" @load-more="loadMoreProducts"
             @click-product="handleProductClick" />
 
         <!-- 分页加载状态 -->
@@ -20,7 +24,7 @@
         </div>
 
         <!-- 没有更多数据提示 -->
-        <div v-if="!hasMoreProducts && products.length > 0" class="py-3 text-center text-gray-500 text-sm">
+        <div v-if="!hasMoreProducts && formattedProducts.length > 0" class="py-3 text-center text-gray-500 text-[16px]">
             没有更多商品了
         </div>
     </div>
@@ -32,7 +36,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useProductStore } from '@/store/product.store';
 import ProductGrid from '@/components/product/ProductGrid.vue';
 import { ProductSortType } from '@/types/product.type';
-import { navigateToProductDetail } from '@/utils/navigation';
+import { formatPrice } from '@/utils/formatPrice';
 
 // 添加激活状态控制
 const isActive = ref(false);
@@ -42,7 +46,7 @@ let unwatchRoute: WatchStopHandle | null = null;
 const route = useRoute();
 const router = useRouter();
 const productStore = useProductStore();
-const products = ref<any[]>([]);
+const rawProducts = ref<any[]>([]);
 const loading = ref(false);
 const loadingMore = ref(false);
 const page = ref(1);
@@ -72,6 +76,19 @@ const pageTitle = computed(() => {
     }
 });
 
+// 格式化后的商品数据 - 确保所有必需属性存在
+const formattedProducts = computed(() => {
+    return rawProducts.value.map(product => ({
+        id: product.id,
+        brand: (product.name ? product.name.split(' ')[0] : '') || 'Brand',
+        title: product.name || '商品名称',
+        price: product.skus && product.skus.length > 0 && typeof product.skus[0].price === 'number'
+            ? product.skus[0].price
+            : 0,
+        imageUrl: product.mainImage || 'https://img.js.design/assets/img/60f77157d961d24e3cf7493e.png'
+    }));
+});
+
 // 是否有更多商品可加载
 const hasMoreProducts = computed(() => {
     return productStore.paginationInfo.page < productStore.paginationInfo.totalPages;
@@ -85,7 +102,6 @@ const normalizeQueryParams = () => {
         keyword: sourceKeyword.value || '',
         page: page.value,
         limit: limit.value,
-        sort: ProductSortType.NEWEST  // 默认使用最新排序
     };
 };
 
@@ -108,10 +124,10 @@ const loadProducts = async (replace = true) => {
         const result = await productStore.loadProductsByType(params.type, params);
 
         if (replace) {
-            products.value = result;
+            rawProducts.value = result;
         } else {
             // 追加数据到现有列表
-            products.value = [...products.value, ...result];
+            rawProducts.value = [...rawProducts.value, ...result];
         }
     } catch (error) {
         console.error('加载商品失败:', error);
@@ -130,10 +146,14 @@ const loadMoreProducts = () => {
     loadProducts(false);
 };
 
-// 使用统一导航工具处理商品点击
+// 处理商品点击 - 避免使用全局导航工具
 const handleProductClick = (product: any) => {
-    navigateToProductDetail(router, product.id);
+    if (product && product.id) {
+        router.push(`/product/detail/${product.id}`);
+    }
 };
+
+
 
 // 清理路由监听
 const clearRouteWatch = () => {
@@ -153,7 +173,7 @@ onActivated(() => {
     isActive.value = true;
 
     // 组件被激活时，仅在必要时加载数据
-    if (page.value === 1 || products.value.length === 0) {
+    if (page.value === 1 || rawProducts.value.length === 0) {
         loadProducts(true);
     }
 
@@ -177,10 +197,12 @@ onBeforeUnmount(() => {
     clearRouteWatch();
 
     // 重置状态，防止内存泄漏
-    products.value = [];
+    rawProducts.value = [];
     page.value = 1;
     loading.value = false;
     loadingMore.value = false;
     isLoading.value = false;
 });
 </script>
+
+<style scoped></style>

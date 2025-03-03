@@ -14,7 +14,7 @@
                         <!-- 产品信息 -->
                         <div class="px-1 flex flex-col items-center">
                               <div class="text-[14px] font-semibold text-black mb-0.5">{{ product.brand }}</div>
-                              <div class="text-[14px] font-bold">${{ product.price.toFixed(2) }}</div>
+                              <div class="text-[14px] font-bold">{{ formatPrice(product.price) }}</div>
                         </div>
                   </div>
             </div>
@@ -23,6 +23,12 @@
 
 <script setup lang="ts">
 import OptimizedImage from '@/components/common/OptimizedImage.vue';
+import { formatPrice } from '@/utils/formatPrice'; // 导入价格格式化工具
+import { useRouter } from 'vue-router';
+
+// 设置
+const router = useRouter();
+
 
 // 定义商品类型
 interface Product {
@@ -45,11 +51,14 @@ const props = withDefaults(defineProps<{
 // 定义事件
 const emit = defineEmits(['load-more', 'click-product']);
 
-// 商品点击事件
+// 商品点击事件 
 const handleProductClick = (product: Product) => {
-      emit('click-product', product);
+  // 先导航到产品详情页
+  if (product && product.id) {
+    router.push(`/product/detail/${product.id}`);
+  }
+  
 };
-
 
 </script>
 

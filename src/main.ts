@@ -6,6 +6,7 @@ import { Lazyload } from 'vant';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { Icon } from "@iconify/vue";
 import { useProductStore } from './store/product.store';
+import { formatPrice } from './utils/formatPrice'; 
 
 // 导入全局样式
 import './assets/styles/tailwind.css'
@@ -39,10 +40,8 @@ app.use(Lazyload, {
 
 // 注册全局属性
 app.config.globalProperties.$filters = {
-      // 价格格式化
-      formatPrice(price: number | string): string {
-            return `¥${Number(price).toFixed(2)}`
-      },
+      // 更新价格格式化方法，使用新的格式化工具
+      formatPrice: (price: number | string): string => formatPrice(price)
 }
 
 // 性能监控

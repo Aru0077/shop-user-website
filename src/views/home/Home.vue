@@ -32,7 +32,7 @@
         <div class="text-[11px] text-gray-700 cursor-pointer" @click="viewAllLatest">View All</div>
       </div>
       <!-- 商品宫格列表 -->
-      <ProductGrid :products="formattedLatestProducts" @click-product="navigateToProductDetail" />
+      <ProductGrid :products="formattedLatestProducts" />
 
       <!-- 占位容器 -->
       <div style="height: 30px;"></div>
@@ -43,7 +43,7 @@
         <div class="text-[11px] text-gray-700 cursor-pointer" @click="viewAllTopSelling">View All</div>
       </div>
       <!-- 商品宫格列表 -->
-      <ProductGrid :products="formattedTopSellingProducts" @click-product="navigateToProductDetail" />
+      <ProductGrid :products="formattedTopSellingProducts" />
     </template>
 
     <!-- 错误提示 -->
