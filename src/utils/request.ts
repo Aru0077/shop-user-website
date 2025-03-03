@@ -7,6 +7,7 @@ import router from '@/router'
 
 // 添加以下工具函数实现请求节流
 const throttledRequests = new Map();
+const pendingRequests = new Map();
 const THROTTLE_DELAY = 150; // 毫秒
 
 // 创建 axios 实例
@@ -21,47 +22,40 @@ const service = axios.create({
       responseType: 'json',
 });
 
-// 记录正在进行的请求
-const pendingRequests = new Map();
+
 
 // 创建请求唯一键
 const getRequestKey = (config: InternalAxiosRequestConfig): string => {
-      const { url, method, params, data } = config;
-      return `${method}-${url}-${JSON.stringify(params)}-${JSON.stringify(data)}`;
+      const { url, method, params } = config;
+      return `${method}-${url}-${JSON.stringify(params)}`;
 };
 
 // 添加请求
 const addPendingRequest = (config: InternalAxiosRequestConfig) => {
       const requestKey = getRequestKey(config);
 
-      // 如果是GET请求且已在节流期内，直接取消
-      if (config.method?.toLowerCase() === 'get' && throttledRequests.has(requestKey)) {
-            const controller = new AbortController();
-            config.signal = controller.signal;
-            controller.abort('Request throttled');
-            return controller;
+      // 仅针对GET请求进行节流处理
+      if (config.method?.toLowerCase() === 'get') {
+            if (throttledRequests.has(requestKey)) {
+                  const controller = new AbortController();
+                  config.signal = controller.signal;
+                  controller.abort('Request throttled');
+                  return controller;
+            }
+
+            throttledRequests.set(requestKey, true);
+            setTimeout(() => throttledRequests.delete(requestKey), THROTTLE_DELAY);
       }
 
-      // 如果已有相同请求正在进行，取消它
+      // 取消同一请求的前一个实例
       if (pendingRequests.has(requestKey)) {
-            const controller = pendingRequests.get(requestKey);
-            controller.abort();
+            pendingRequests.get(requestKey).abort();
             pendingRequests.delete(requestKey);
       }
 
-      // 创建新的AbortController
       const controller = new AbortController();
       config.signal = controller.signal;
       pendingRequests.set(requestKey, controller);
-
-      // 设置节流（仅GET请求）
-      if (config.method?.toLowerCase() === 'get') {
-            throttledRequests.set(requestKey, true);
-            setTimeout(() => {
-                  throttledRequests.delete(requestKey);
-            }, THROTTLE_DELAY);
-      }
-
       return controller;
 };
 
@@ -113,7 +107,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
       (response: AxiosResponse) => {
             console.log('结果:', response.data);
-            
+
             // 从队列中移除已完成的请求
             removePendingRequest(response.config);
 

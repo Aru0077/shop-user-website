@@ -1,19 +1,12 @@
 <!-- 简化版 src/components/common/OptimizedImage.vue -->
 <template>
       <div class="optimized-image-wrapper" :class="{ 'fixed-height': fixedHeight }" :style="containerStyle">
-            <!-- 加载状态占位符 -->
-            <div v-if="loading" class="image-placeholder">
-                  <div class="loading-pulse"></div>
-            </div>
-
-            <!-- 错误状态提示 -->
-            <div v-if="error" class="image-error">
-                  <slot name="error">图片加载失败</slot>
-            </div>
+            <!-- 只在加载中时显示占位符 -->
+            <div v-if="loading" class="image-placeholder"></div>
 
             <!-- 图片元素 -->
-            <img :src="src" :alt="alt" :class="imageClass ? `${imageClass} object-${objectFit}` : `object-${objectFit}`"
-                  @load="handleImageLoaded" @error="handleImageError" loading="lazy" decoding="async" />
+            <img :src="src" :alt="alt" :class="[imageClass, `object-${objectFit}`]" @load="loading = false"
+                  @error="handleImageError" loading="lazy" decoding="async" />
       </div>
 </template>
 
@@ -53,16 +46,9 @@ const loading = ref(true);
 const error = ref(false);
 
 // 计算容器样式 - 简化
-const containerStyle = computed(() => {
-      return props.fixedHeight
-            ? {}
-            : { paddingBottom: `${(1 / props.aspectRatio) * 100}%` };
-});
-
-// 图片加载完成处理
-const handleImageLoaded = () => {
-      loading.value = false;
-};
+const containerStyle = computed(() =>
+      props.fixedHeight ? null : { paddingBottom: `${(1 / props.aspectRatio) * 100}%` }
+);
 
 // 图片加载错误处理
 const handleImageError = () => {

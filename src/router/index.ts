@@ -346,51 +346,37 @@ const router = createRouter({
 // 不需要重定向的白名单路由
 const whiteList = ['/login', '/register', '/home', '/category', '/product/list', '/product/detail', '/privacy', '/terms']
 
-// 路由前置守卫
+// 路由前置守卫 
 router.beforeEach((to, from, next) => {
       // 设置页面标题
-      document.title = `${to.meta.title || '购物商城'}`
+      document.title = `${to.meta.title || '购物商城'}`;
 
       // 使用 Pinia store 检查登录状态
-      const userStore = useUserStore()
-      const isLoggedIn = userStore.getIsLoggedIn
+      const userStore = useUserStore();
+      const isLoggedIn = userStore.getIsLoggedIn;
 
-      // 判断是否需要登录权限
-      if (to.meta.auth) {
-            if (!isLoggedIn) {
-                  // 未登录，跳转到登录页并保存原始请求路径
-                  next({
-                        path: '/login',
-                        query: { redirect: to.fullPath },
-                  })
-                  return
-            }
-      }
-
-      // 如果已登录且要跳转登录页，重定向到首页或之前请求的页面
-      if (isLoggedIn && (to.path === '/login' || to.path === '/register')) {
-            // 如果有重定向参数，则跳转到相应页面
-            const redirect = from.query.redirect as string || '/home'
-            next({ path: redirect })
-            return
-      }
-
-      // 白名单路径直接放行
+      // 简化登录判断逻辑
       if (whiteList.some(path => to.path.startsWith(path))) {
-            next()
-            return
-      }
-
-      // 其他路径，如果已登录则放行，否则重定向到登录页
-      if (isLoggedIn) {
-            next()
-      } else {
+            // 白名单路径直接放行
+            next();
+      } else if (to.meta.auth && !isLoggedIn) {
+            // 需要登录但未登录，重定向到登录页
             next({
                   path: '/login',
                   query: { redirect: to.fullPath },
-            })
+            });
+      } else if (isLoggedIn && (to.path === '/login' || to.path === '/register')) {
+            // 已登录用户访问登录/注册页，重定向
+            const redirect = from.query.redirect as string || '/home';
+            next({ path: redirect });
+      } else {
+            // 其他情况
+            isLoggedIn ? next() : next({
+                  path: '/login',
+                  query: { redirect: to.fullPath },
+            });
       }
-})
+});
 
 // 路由后置守卫
 router.afterEach(() => {

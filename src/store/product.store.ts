@@ -33,6 +33,9 @@ export const useProductStore = defineStore('product', () => {
       const categoryProducts = ref<Product[]>([]);
       const currentProduct = ref<ProductDetail | null>(null);
 
+      // 添加请求防抖控制
+      let homeDataTimer: NodeJS.Timeout | null = null;
+
       // 加载状态
       const loading = ref<boolean>(false);
 
@@ -80,18 +83,34 @@ export const useProductStore = defineStore('product', () => {
       }
 
       // 方法: 加载首页数据
-      async function loadHomeData() {
-            try {
-                  loading.value = true;
-                  const res = await getHomeDataApi();
-                  homeData.value = res.data;
+      async function loadHomeData(force = false) {
+            // 如果已有数据且非强制刷新，返回缓存数据
+            if (homeData.value && !force) {
                   return homeData.value;
-            } catch (error) {
-                  console.error('Failed to load home data:', error);
-                  return null;
-            } finally {
-                  loading.value = false;
             }
+
+            // 防抖处理，防止短时间内多次请求
+            if (homeDataTimer) clearTimeout(homeDataTimer);
+
+            return new Promise((resolve) => {
+                  homeDataTimer = setTimeout(async () => {
+                        try {
+                              loading.value = true;
+                              const res = await getHomeDataApi();
+                              homeData.value = res.data;
+
+                              // 缓存最后更新时间
+                              localStorage.setItem('homeLastUpdate', Date.now().toString());
+
+                              resolve(homeData.value);
+                        } catch (error) {
+                              console.error('Failed to load home data:', error);
+                              resolve(null);
+                        } finally {
+                              loading.value = false;
+                        }
+                  }, 100);
+            });
       }
 
       // 方法: 加载最新商品

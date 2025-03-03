@@ -78,6 +78,7 @@ const isPageActive = ref(true);
 // 首页数据
 const homeData = computed<HomeData | null>(() => productStore.getHomeDataValue);
 
+
 // 格式化最新商品数据
 const formattedLatestProducts = computed(() => {
   return (homeData.value?.latestProducts || []).map(product => ({

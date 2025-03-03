@@ -1,24 +1,19 @@
 <!-- src/components/home/ProductGrid.vue -->
 <template>
       <div class="product-grid">
-            <!-- 商品网格列表 -->
+            <!-- 使用v-memo以避免不必要的重渲染 -->
             <div class="grid grid-cols-2 gap-3">
-                  <div v-for="(product, index) in products" :key="index" class="product-card">
-                        <!-- 商品图片容器 -->
+                  <div v-for="(product, index) in products" :key="product.id" v-memo="[product.id, product.price]"
+                        class="product-card" @click="handleProductClick(product)">
+                        <!-- 图片容器 -->
                         <div class="relative overflow-hidden mb-0.5">
                               <OptimizedImage :src="product.imageUrl" :alt="product.title" :aspect-ratio="1"
                                     image-class="rounded-md" objectFit="cover" />
                         </div>
 
-                        <!-- 商品信息 -->
+                        <!-- 产品信息 -->
                         <div class="px-1 flex flex-col items-center">
-                              <!-- 品牌名称 -->
                               <div class="text-[14px] font-semibold text-black mb-0.5">{{ product.brand }}</div>
-
-                              <!-- 商品名称 -->
-                              <!-- <div class="text-[10px] text-gray-600 mb-0.5">{{ product.title }}</div> -->
-
-                              <!-- 商品价格 -->
                               <div class="text-[14px] font-bold">${{ product.price.toFixed(2) }}</div>
                         </div>
                   </div>
@@ -38,14 +33,11 @@ interface Product {
       imageUrl: string;
 }
 
-// 定义组件属性
-interface Props {
+// 设置默认值
+const props = withDefaults(defineProps<{
       products: Product[];
       showLoadMore?: boolean;
-}
-
-// 设置默认值
-const props = withDefaults(defineProps<Props>(), {
+}>(), {
       products: () => [],
       showLoadMore: false
 });
@@ -53,15 +45,12 @@ const props = withDefaults(defineProps<Props>(), {
 // 定义事件
 const emit = defineEmits(['load-more', 'click-product']);
 
-// 加载更多商品
-const loadMore = () => {
-      emit('load-more');
-};
-
 // 商品点击事件
 const handleProductClick = (product: Product) => {
       emit('click-product', product);
 };
+
+
 </script>
 
 <style scoped>
