@@ -7,7 +7,6 @@ import { ApiResponse } from './api.type';
 export interface UserInfo {
     id: string;
     username: string;
-    createdAt?: string;
 }
 
 /**
