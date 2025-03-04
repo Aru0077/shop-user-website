@@ -1,5 +1,6 @@
 // src/types/favorite.type.ts
 import { ApiResponse } from './api.type';
+import { ProductStatus } from './product.type'; 
 
 /**
  * 收藏商品接口
@@ -30,16 +31,6 @@ export interface FavoriteProduct {
         promotion_price: number | null;
         stock: number;
     }>;
-}
-
-/**
- * 商品状态枚举
- */
-export enum ProductStatus {
-    DRAFT = 'DRAFT',
-    ONLINE = 'ONLINE',
-    OFFLINE = 'OFFLINE',
-    DELETED = 'DELETED'
 }
 
 /**

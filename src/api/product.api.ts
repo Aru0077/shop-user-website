@@ -20,7 +20,7 @@ export function getCategoryTree() {
 /**
  * 获取首页数据
  */
-export function getHomeData() {
+export function getHomePageData() {
       return get<ApiResponse<HomeData>>('/products/home-data');
 }
 

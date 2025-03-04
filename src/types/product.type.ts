@@ -1,7 +1,9 @@
 // src/types/product.type.ts
 import { ApiResponse } from './api.type';
 
-
+/**
+ * 商品状态枚举
+ */
 export enum ProductStatus {
       DRAFT = 'DRAFT',
       ONLINE = 'ONLINE',

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import {
       getCategoryTree,
-      getHomeData as getHomeDataApi,
+      getHomePageData as getHomeDataApi,
       getLatestProducts,
       getTopSellingProducts,
       getPromotionProducts,
