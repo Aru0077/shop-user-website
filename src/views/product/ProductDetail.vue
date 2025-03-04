@@ -6,7 +6,7 @@
         <div class="fixed top-0 left-0 right-0 w-full h-[60px] bg-transparent z-50">
             <div class="nav-bar flex items-center justify-between box-border h-[60px] px-2 w-full">
                 <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
-                    <ChevronLeft />
+                    <ChevronLeft @click="goBack"/>
                 </div>
                 <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
                     <Share2 />
@@ -282,6 +282,13 @@ onMounted(() => {
 onUnmounted(() => {
     productStore.clearCurrentProduct();
 });
+
+// 返回上一页
+const goBack = () => {
+    router.back();
+};
+
+
 </script>
 
 <style scoped>

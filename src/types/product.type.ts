@@ -1,6 +1,15 @@
 // src/types/product.type.ts
 import { ApiResponse } from './api.type';
 
+
+export enum ProductStatus {
+      DRAFT = 'DRAFT',
+      ONLINE = 'ONLINE',
+      OFFLINE = 'OFFLINE',
+      DELETED = 'DELETED'
+}
+
+
 // 商品基础接口
 export interface Product {
       id: number;
@@ -10,7 +19,7 @@ export interface Product {
       mainImage?: string;
       detailImages?: any;
       is_promotion?: number;
-      status: string;
+      status: ProductStatus;
       productCode: string;
       createdAt: string;
       updatedAt: string;
