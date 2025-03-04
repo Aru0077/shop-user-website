@@ -17,9 +17,6 @@
             <div class="ml-3 flex-1">
                 <div class="text-[22px] font-bold" v-if="userInfo">{{ userInfo.username }}</div>
                 <div class="text-[20px] font-bold" v-else>Guest</div>
-                <div class="text-[16px] text-gray-500" v-if="userInfo">
-                    Joined: {{ formatDate(userInfo.createdAt) }}
-                </div>
                 <div class="text-xs text-gray-500" v-else>
                     Sign in to experience more features
                 </div>
@@ -191,31 +188,8 @@ const isLoggedIn = computed(() => userStore.getIsLoggedIn);
 // 获取收藏数量
 const favoriteCount = computed(() => favoriteStore.favoriteCount);
 
-// 页面加载时执行
-onMounted(() => {
-    // 如果已登录，加载收藏数据
-    if (isLoggedIn.value) {
-        loadFavoriteData();
-    }
-});
 
-// Load favorite data
-const loadFavoriteData = async () => {
-    try {
-        await favoriteStore.loadFavorites(1, 1); // Only need count information
-    } catch (error) {
-        console.error('Failed to load favorites:', error);
-    }
-};
-
-// Format date
-const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-};
-
+ 
 // Page navigation
 const navigateTo = (path: string) => {
     router.push(path);

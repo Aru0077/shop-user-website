@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Banner: typeof import('./src/components/home/Banner.vue')['default']
     CustomTabBar: typeof import('./src/components/common/CustomTabBar.vue')['default']
+    ListProductView: typeof import('./src/components/product/ListProductView.vue')['default']
     NavBar: typeof import('./src/components/common/NavBar.vue')['default']
     OptimizedImage: typeof import('./src/components/common/OptimizedImage.vue')['default']
     ProductGrid: typeof import('./src/components/product/ProductGrid.vue')['default']
@@ -32,7 +33,10 @@ declare module 'vue' {
     VanImage: typeof import('vant/es')['Image']
     VanLoading: typeof import('vant/es')['Loading']
     VanNavBar: typeof import('vant/es')['NavBar']
+    VanPicker: typeof import('vant/es')['Picker']
+    VanPopup: typeof import('vant/es')['Popup']
     VanPullRefresh: typeof import('vant/es')['PullRefresh']
+    VanStepper: typeof import('vant/es')['Stepper']
     VanTabbar: typeof import('vant/es')['Tabbar']
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
   }

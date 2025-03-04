@@ -169,4 +169,6 @@ export const useFavoriteStore = defineStore('favorite', () => {
             toggleFavorite,
             resetFavorites
       };
+}, {
+      persist: true // 添加持久化配置
 });

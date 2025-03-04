@@ -65,7 +65,7 @@ const productId = computed(() => Number(route.params.id));
 const productDetail = computed(() => productStore.currentProduct);
 const quantity = ref(1);
 const selectedSpecs = ref<Record<number, number>>({});
-const isFavorited = computed(() => favoriteStore.isProductFavorited(productId.value));
+const isFavorited = computed(() => favoriteStore.isFavorite(productId.value));
 
 // 处理SKU变更
 const handleSkuChange = (sku) => {
@@ -276,12 +276,7 @@ watch(() => productId.value, (newVal, oldVal) => {
 // Lifecycle hooks
 onMounted(() => {
     document.title = '商品详情';
-    loadProductDetail(false); // 默认不强制刷新，优先使用缓存
-
-    // 初始化收藏状态
-    if (userStore.isLoggedIn) {
-        favoriteStore.loadFavorites();
-    }
+    loadProductDetail(false); // 默认不强制刷新，优先使用缓存 
 });
 
 onUnmounted(() => {
