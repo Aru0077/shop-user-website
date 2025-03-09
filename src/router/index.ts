@@ -31,7 +31,8 @@ const routes: Array<RouteRecordRaw> = [
                   keepAlive: true,
                   navBar: {
                         show: true,
-                        leftBtn: 'home',
+                        leftBtn: 'logo',
+                        rightBtn: 'cart'
                   },
                   tabBar: {
                         show: true
@@ -47,7 +48,8 @@ const routes: Array<RouteRecordRaw> = [
                   keepAlive: true,
                   navBar: {
                         show: true,
-                        leftBtn: 'category',
+                        leftBtn: 'logo',
+                        rightBtn: 'cart'
                   },
                   tabBar: {
                         show: true
@@ -55,16 +57,16 @@ const routes: Array<RouteRecordRaw> = [
             },
       },
       {
-            path: '/cart',
-            name: 'Cart',
-            component: () => import('@/views/cart/Cart.vue'),
+            path: '/favorite',
+            name: 'Favorite',
+            component: () => import('@/views/favorite/Favorite.vue'),
             meta: {
-                  title: 'UniMall - Cart',
-                  auth: true, // 购物车需要登录 
-                  keepAlive: true,
+                  title: 'UniMall - Favorite',
+                  auth: true, // 收藏需要登录
                   navBar: {
                         show: true,
-                        leftBtn: 'cart',
+                        leftBtn: 'logo',
+                        rightBtn: 'cart'
                   },
                   tabBar: {
                         show: true
@@ -81,7 +83,8 @@ const routes: Array<RouteRecordRaw> = [
                   keepAlive: true,
                   navBar: {
                         show: true,
-                        leftBtn: 'user',
+                        leftBtn: 'logo',
+                        rightBtn: 'cart'
                   },
                   tabBar: {
                         show: true
@@ -105,7 +108,7 @@ const routes: Array<RouteRecordRaw> = [
                   navBar: {
                         show: true,
                         leftBtn: 'back',
-                        rightBtn: 'none'
+                        rightBtn: 'add'
                   },
                   tabBar: {
                         show: false
@@ -180,24 +183,24 @@ const routes: Array<RouteRecordRaw> = [
                   }
             },
       },
-      // favorite
+      // cart
       {
-            path: '/favorite',
-            name: 'Favorite',
-            component: () => import('@/views/favorite/Favorite.vue'),
+            path: '/cart',
+            name: 'Cart',
+            component: () => import('@/views/cart/Cart.vue'),
             meta: {
-                  title: 'UniMall - Favorite',
-                  auth: true, // 收藏需要登录
+                  title: 'UniMall - Cart',
+                  auth: true, // 购物车需要登录 
+                  keepAlive: true,
                   navBar: {
                         show: true,
                         leftBtn: 'back',
-                        rightBtn: 'none'
                   },
                   tabBar: {
                         show: false
                   }
             },
-      },
+      }, 
       // legal
       {
             path: '/privacy',
@@ -232,6 +235,23 @@ const routes: Array<RouteRecordRaw> = [
             },
       },
       // order
+      {
+            path: '/order/comfirm',
+            name: 'ConfirmOrder',
+            component: () => import('@/views/order/ConfirmOrder.vue'),
+            meta: {
+                  title: 'UniMall - Order',
+                  auth: true,
+                  navBar: {
+                        show: true,
+                        leftBtn: 'back',
+                        rightBtn: 'none'
+                  },
+                  tabBar: {
+                        show: false
+                  }
+            },
+      },
       {
             path: '/order/list',
             name: 'OrderList',
@@ -268,7 +288,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       // payment
       {
-            path: '/payment',
+            path: '/payment/:id',
             name: 'Payment',
             component: () => import('@/views/payment/Payment.vue'),
             meta: {

@@ -2,13 +2,13 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import {
-      getAddresses as getAddressesApi,
-      createAddress as createAddressApi,
-      updateAddress as updateAddressApi,
-      deleteAddress as deleteAddressApi,
-      setDefaultAddress as setDefaultAddressApi
+      getAddressesApi,
+      createAddressApi,
+      updateAddressApi,
+      deleteAddressApi,
+      setDefaultAddressApi
 } from '@/api/address.api';
-import { Address, CreateAddressParams } from '@/types/address.type';
+import { Address, CreateAddressParams, UpdateAddressParams } from '@/types/address.type';
 import { useUserStore } from './user.store';
 
 export const useAddressStore = defineStore('address', () => {
@@ -68,7 +68,7 @@ export const useAddressStore = defineStore('address', () => {
       }
 
       // 方法: 更新地址
-      async function updateAddress(id: number, data: CreateAddressParams) {
+      async function updateAddress(id: number, data: UpdateAddressParams) {
             const userStore = useUserStore();
             if (!userStore.isLoggedIn) return null;
 

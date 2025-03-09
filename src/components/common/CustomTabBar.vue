@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { useRoute } from 'vue-router';
-import { Home, LayoutGrid, ShoppingCart, User } from 'lucide-vue-next';
+import { Home, LayoutGrid, Heart, User } from 'lucide-vue-next';
 
 const route = useRoute();
 
@@ -28,9 +28,9 @@ const tabItems = [
             icon: LayoutGrid
       },
       {
-            text: '购物车',
-            path: '/cart',
-            icon: ShoppingCart
+            text: '收藏',
+            path: '/favorite',
+            icon: Heart
       },
       {
             text: '我的',

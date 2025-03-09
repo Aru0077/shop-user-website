@@ -3,7 +3,7 @@
     <div class="pageContent">
         <!-- 顶部标题 -->
         <div class="px-[5px]">
-            <div class="text-[20px] font-bold leading-4 text-black">My Addresses</div>
+            <div class="text-[25px] font-bold leading-4 text-black">My Addresses</div>
         </div>
 
         <!-- 占位容器 -->
@@ -85,7 +85,6 @@ import { showDialog, showToast, showSuccessToast } from 'vant';
 import { useAddressStore } from '@/store/address.store';
 import { useUserStore } from '@/store/user.store';
 import { Address } from '@/types/address.type';
-import { MapPin } from 'lucide-vue-next';
 
 // 初始化
 const router = useRouter();

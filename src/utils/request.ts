@@ -5,6 +5,16 @@ import 'vant/es/toast/style'
 import 'vant/es/notify/style'
 import router from '@/router'
 
+declare module 'axios' {
+      export interface AxiosRequestConfig {
+            loading?: boolean;
+      }
+
+      export interface InternalAxiosRequestConfig {
+            loading?: boolean;
+      }
+}
+
 // 添加以下工具函数实现请求节流
 const throttledRequests = new Map();
 const pendingRequests = new Map();
@@ -69,8 +79,9 @@ const removePendingRequest = (config: InternalAxiosRequestConfig) => {
 // 请求拦截器
 service.interceptors.request.use(
       async (config: InternalAxiosRequestConfig) => {
+
             // 是否需要显示加载中
-            if (config.headers?.loading !== false) {
+            if (config.loading !== false && config.headers?.loading !== false) {
                   showLoadingToast({
                         message: '加载中...',
                         forbidClick: true,

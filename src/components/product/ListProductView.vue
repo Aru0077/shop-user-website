@@ -1,22 +1,6 @@
 <!-- src/components/product/ListProductView.vue -->
 <template>
-      <div class="product-list">
-            <!-- 编辑模式下的顶部操作栏 -->
-            <div v-if="isEditMode" class="flex justify-between items-center mb-3 px-1">
-                  <van-checkbox v-model="isAllSelected" shape="square" @change="toggleSelectAll" class="text-[14px]">
-                        全选
-                  </van-checkbox>
-                  <div class="flex items-center gap-3">
-                        <span v-if="selectedItems.length > 0" class="text-[14px] text-gray-500">
-                              已选 {{ selectedItems.length }} 件
-                        </span>
-                        <van-button size="small" type="danger" :disabled="selectedItems.length === 0"
-                              @click="confirmDelete">
-                              删除
-                        </van-button>
-                  </div>
-            </div>
-
+      <div class="product-list"> 
             <!-- 商品列表 -->
             <div class="space-y-3">
                   <div v-for="item in items" :key="item.id" class="product-item bg-white rounded-lg p-3 flex relative">
@@ -28,7 +12,7 @@
 
                         <!-- 商品图片 -->
                         <div class="flex-shrink-0 mr-3">
-                              <img :src="item.image" :alt="item.name" class="w-20 h-20 object-cover rounded-md"
+                              <img :src="item.image" :alt="item.name" class="w-10 h-10 object-cover rounded-md"
                                     @click="handleProductClick(item)" />
                         </div>
 
@@ -237,8 +221,4 @@ const checkout = () => {
       padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* 设置内容区域底部padding，避免底部操作栏遮挡 */
-.product-list {
-      padding-bottom: calc(72px + env(safe-area-inset-bottom));
-}
 </style>

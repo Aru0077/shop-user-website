@@ -4,11 +4,11 @@
             <!-- 使用v-memo以避免不必要的重渲染 -->
             <div class="grid grid-cols-2 gap-3">
                   <div v-for="(product, index) in products" :key="product.id" v-memo="[product.id, product.price]"
-                        class="product-card" @click="handleProductClick(product)">
+                        class="product-card " @click="handleProductClick(product)">
                         <!-- 图片容器 -->
-                        <div class="relative overflow-hidden mb-0.5">
+                        <div class="relative overflow-hidden mb-0.5 ">
                               <OptimizedImage :src="product.imageUrl" :alt="product.title" :aspect-ratio="1"
-                                    image-class="rounded-md" objectFit="cover" />
+                                    image-class="rounded-md " objectFit="cover" />
                         </div>
 
                         <!-- 产品信息 -->

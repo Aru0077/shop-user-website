@@ -2,7 +2,7 @@
 <template>
       <div class="flex items-center w-full h-[50px] p-0 box-border">
           <!-- 搜索输入框 -->
-          <div class="flex-1 relative h-[50px] flex items-center bg-[rgba(243,244,245,1)] rounded-[30px]">
+          <div class="flex-1 relative h-[50px] flex items-center bg-[#ffffff] rounded-[30px] shadow-lg">
               <Search class="absolute left-2.5 z-1"/>
               <input 
                   type="text" 
@@ -22,7 +22,7 @@
           
           <!-- 搜索按钮 -->
           <div 
-              class="flex items-center justify-center w-[50px] h-[50px] bg-black rounded-full ml-2 cursor-pointer transition-colors duration-300 hover:bg-gray-900 active:bg-gray-900" 
+              class="flex items-center justify-center w-[50px] h-[50px] bg-black rounded-full ml-2 cursor-pointer transition-colors duration-300 hover:bg-gray-900 active:bg-gray-900 shadow-lg" 
               @click="handleSearch"
           >
               <Search color="#fff" />

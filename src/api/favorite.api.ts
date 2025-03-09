@@ -8,28 +8,35 @@ import {
     AddFavoriteParams,
     BatchRemoveFavoritesParams
 } from '@/types/favorite.type';
+import { AxiosRequestConfig } from 'axios';
 
 /**
  * 添加商品到收藏
  * @param data 收藏参数
  */
-export function addFavorite(data: AddFavoriteParams) {
-    return post<ApiResponse<null>>('/favorites', data);
+export function addFavoriteApi(data: AddFavoriteParams, config?: AxiosRequestConfig) {
+    return post<ApiResponse<null>>('/favorites', data , {
+        ...config,
+        loading: false
+  });
 }
 
 /**
  * 从收藏中移除商品
  * @param productId 商品ID
  */
-export function removeFavorite(productId: number) {
-    return del<ApiResponse<null>>(`/favorites/${productId}`);
+export function removeFavoriteApi(productId: number, config?: AxiosRequestConfig) {
+    return del<ApiResponse<null>>(`/favorites/${productId}`, {
+        ...config,
+        loading: false
+  });
 }
 
 /**
  * 批量从收藏中移除商品
  * @param data 批量移除参数
  */
-export function batchRemoveFavorites(data: BatchRemoveFavoritesParams) {
+export function batchRemoveFavoritesApi(data: BatchRemoveFavoritesParams) {
     return post<ApiResponse<null>>('/favorites/batch-remove', data);
 }
 
@@ -37,7 +44,7 @@ export function batchRemoveFavorites(data: BatchRemoveFavoritesParams) {
  * 获取收藏商品列表
  * @param params 分页参数
  */
-export function getFavorites(params?: {
+export function getFavoritesApi(params?: {
     page?: number;
     limit?: number;
 }) {
@@ -47,7 +54,7 @@ export function getFavorites(params?: {
 /**
  * 获取收藏商品ID列表
  */
-export function getFavoriteIds() {
+export function getFavoriteIdsApi() {
     return get<ApiResponse<FavoriteIdsResponse>>('/favorites', { idsOnly: true });
 }
 
@@ -57,6 +64,6 @@ export function getFavoriteIds() {
  * @param productId 商品ID
  * @param favoriteIds 收藏ID列表
  */
-export function isFavorite(productId: number, favoriteIds: number[]): boolean {
+export function isFavoriteApi(productId: number, favoriteIds: number[]): boolean {
     return favoriteIds.includes(productId);
 }

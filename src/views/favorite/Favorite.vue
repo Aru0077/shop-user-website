@@ -1,109 +1,128 @@
-<!-- src/views/favorite/FavoriteList.vue -->
+<!-- 收藏列表页面 -->
 <template>
     <div class="pageContent">
         <!-- 顶部标题 -->
-        <div class="flex justify-between items-center mb-4">
-            <div class="text-[20px] font-bold">我的收藏</div>
-            <div @click="toggleEditMode" class="text-[14px] text-blue-600">
-                {{ isEditMode ? '完成' : '编辑' }}
+        <div class="px-[5px]">
+            <div class="text-[25px] font-bold leading-4 text-black">My Favorites</div>
+        </div>
+
+        <!-- 空状态展示 -->
+        <div v-if="favoriteStore.favorites.length === 0 && !favoriteStore.loading"
+            class="flex flex-col items-center justify-center h-[300px]">
+            <HeartOff :size="48" class="text-gray-300 mb-4" />
+            <div class="text-gray-400">暂无收藏商品</div>
+            <div class="mt-4">
+                <van-button type="primary" size="small" @click="goToHome">去逛逛</van-button>
             </div>
         </div>
 
-        <!-- 使用列表组件 -->
-        <ListProductView :items="favoriteItems" :is-edit-mode="isEditMode" :show-quantity="false" empty-text="暂无收藏商品"
-            @item-click="handleItemClick" @delete="handleDelete" />
+        <!-- 单个收藏商品 -->
+        <van-grid :column-num="2" gutter="1" :border="false" v-if="favoriteStore.favorites.length > 0"
+            :loading="favoriteStore.loading">
+            <van-grid-item v-for="(item, index) in favoriteStore.favorites" :key="index" class="relativ"
+                @click="goToProductDetail(String(item.product?.id))">
+                <van-image :src="item.product?.mainImage" fit="cover" radius="20px" />
+                <div class="text-[16px] font-bold mt-1">{{ item.product?.name }}</div>
+                <div class="text-[14px] font-medium mt-0.5">{{ formatPrice(getLowestPrice(item.product)) }}</div>
+                <Trash2 @click="removeItem(item)" :size="20"
+                    class=" absolute top-2 right-1 bg-black text-white p-0.5 rounded-sm" />
+
+            </van-grid-item>
+        </van-grid>
+
+        <!-- 加载更多 -->
+        <div v-if="favoriteStore.favorites.length > 0 && favoriteStore.favorites.length < favoriteStore.total"
+            class="flex justify-center py-4">
+            <van-button plain type="primary" size="small" @click="loadMore" :loading="loadingMore">加载更多</van-button>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { showToast, showSuccessToast } from 'vant';
 import { useFavoriteStore } from '@/store/favorite.store';
-import ListProductView from '@/components/product/ListProductView.vue';
+import { useCartStore } from '@/store/cart.store';
+import { useRouter } from 'vue-router';
+import { showNotify, showToast } from 'vant';
+import { Trash2, HeartOff } from 'lucide-vue-next';
+import { formatPrice } from '@/utils/formatPrice';
 
-// 初始化
-const router = useRouter();
 const favoriteStore = useFavoriteStore();
-const isEditMode = ref(false);
+const cartStore = useCartStore();
+const router = useRouter();
+const loadingMore = ref(false);
 
-// 获取收藏数据
-const favoriteItems = ref<any[]>([]);
-const loading = ref(false);
+// 获取商品最低价格
+const getLowestPrice = (product: any): number => {
+    // 检查product和skus是否存在
+    if (!product || !product.skus || !Array.isArray(product.skus) || product.skus.length === 0) {
+        return 0; // 无有效sku时返回0
+    }
 
-// 加载收藏列表
-const loadFavorites = async () => {
+    // 提取最低价格：比较所有sku的常规价格和促销价格
+    return Math.min(
+        ...product.skus.map((sku) => {
+            // 如果有促销价且不为null，使用促销价；否则使用常规价格
+            const effectivePrice = sku.promotion_price !== null && sku.promotion_price !== undefined
+                ? sku.promotion_price
+                : sku.price;
+
+            return effectivePrice;
+        })
+    );
+};
+
+// 移除收藏项
+const removeItem = async (item: any) => {
+    const success = await favoriteStore.removeFromFavorite(item.productId);
+    if (success) {
+        showNotify({ type: 'success', message: '已移除收藏' });
+    }
+};
+
+
+
+// 加载更多
+const loadMore = async () => {
+    if (loadingMore.value) return;
+
+    loadingMore.value = true;
     try {
-        loading.value = true;
-        const result = await favoriteStore.loadFavorites();
-
-        if (result && result.data) {
-            favoriteItems.value = result.data.map(item => ({
-                id: item.productId,
-                brand: item.product?.name || '未知商品',
-                name: item.product?.category?.name || '未分类',
-                price: item.product?.skus?.[0]?.price || 0,
-                image: item.product?.mainImage || '',
-                quantity: 1,
-                selected: false
-            }));
-        }
+        const nextPage = favoriteStore.page + 1;
+        await favoriteStore.loadFavorites(nextPage, favoriteStore.limit);
     } catch (error) {
-        console.error('加载收藏列表失败:', error);
-        showToast('加载收藏列表失败');
+        showToast('加载失败，请稍后再试');
     } finally {
-        loading.value = false;
+        loadingMore.value = false;
     }
 };
 
-// 切换编辑模式
-const toggleEditMode = () => {
-    isEditMode.value = !isEditMode.value;
-
-    // 退出编辑模式时，重置选择状态
-    if (!isEditMode.value) {
-        favoriteItems.value.forEach(item => {
-            item.selected = false;
-        });
-    }
+// 跳转到首页
+const goToHome = () => {
+    router.push('/');
 };
 
-// 处理商品点击
-const handleItemClick = (item: any) => {
-    router.push(`/product/detail/${item.id}`);
+// 跳转到商品详情页
+const goToProductDetail = (productId: string) => {
+    router.push(`/product/detail/${productId}`);
 };
 
-// 处理删除操作
-const handleDelete = async (itemIds: (string | number)[]) => {
-    try {
-        if (itemIds.length === 1) {
-            // 删除单个商品
-            const result = await favoriteStore.removeFromFavorite(Number(itemIds[0]));
-            if (result) {
-                favoriteItems.value = favoriteItems.value.filter(item => item.id !== itemIds[0]);
-                showSuccessToast('删除成功');
-            }
-        } else if (itemIds.length > 1) {
-            // 批量删除商品
-            const result = await favoriteStore.batchRemoveFromFavorites(itemIds.map(id => Number(id)));
-            if (result) {
-                favoriteItems.value = favoriteItems.value.filter(item => !itemIds.includes(item.id));
-                showSuccessToast('批量删除成功');
-            }
-        }
-
-        // 如果没有收藏商品了，退出编辑模式
-        if (favoriteItems.value.length === 0) {
-            isEditMode.value = false;
-        }
-    } catch (error) {
-        console.error('删除收藏失败:', error);
-        showToast('删除失败，请稍后重试');
-    }
-};
-
-// 页面加载时获取收藏列表
-onMounted(() => {
-    loadFavorites();
+// 初始化加载
+onMounted(async () => {
+    await favoriteStore.preloadFavoriteData();
 });
 </script>
+
+<style scoped>
+.favoriteItem:last-child {
+    border-bottom: none;
+}
+
+.add-to-cart-btn {
+    border: none;
+}
+
+::v-deep .van-grid-item__content {
+    background-color: #FAFAFA;
+}
+</style>

@@ -10,7 +10,7 @@ import {
 /**
  * 获取收货地址列表
  */
-export function getAddresses() {
+export function getAddressesApi() {
       return get<ApiResponse<Address[]>>('/addresses');
 }
 
@@ -18,7 +18,7 @@ export function getAddresses() {
  * 创建收货地址
  * @param data 地址信息
  */
-export function createAddress(data: CreateAddressParams) {
+export function createAddressApi(data: CreateAddressParams) {
       return post<ApiResponse<Address>>('/addresses', data);
 }
 
@@ -27,7 +27,7 @@ export function createAddress(data: CreateAddressParams) {
  * @param id 地址ID
  * @param data 地址信息
  */
-export function updateAddress(id: number, data: CreateAddressParams) {
+export function updateAddressApi(id: number, data: UpdateAddressParams) {
       return put<ApiResponse<Address>>(`/addresses/${id}`, data);
 }
 
@@ -35,7 +35,7 @@ export function updateAddress(id: number, data: CreateAddressParams) {
  * 删除收货地址
  * @param id 地址ID
  */
-export function deleteAddress(id: number) {
+export function deleteAddressApi(id: number) {
       return del<ApiResponse<null>>(`/addresses/${id}`);
 }
 
@@ -43,6 +43,6 @@ export function deleteAddress(id: number) {
  * 设置默认收货地址
  * @param id 地址ID
  */
-export function setDefaultAddress(id: number) {
+export function setDefaultAddressApi(id: number) {
       return patch<ApiResponse<Address>>(`/addresses/${id}/default`);
 }

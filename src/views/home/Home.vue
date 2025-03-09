@@ -35,15 +35,19 @@
       <ProductGrid :products="formattedLatestProducts" />
 
       <!-- 占位容器 -->
-      <div style="height: 30px;"></div>
+      <div style="height: 30px;" v-if="formattedTopSellingProducts.length > 0"></div>
 
       <!-- 热销商品 -->
-      <div class="flex items-end justify-between mb-1.5 mt-1">
-        <div class="text-[18px] font-bold text-black">Top Selling</div>
-        <div class="text-[11px] text-gray-700 cursor-pointer" @click="viewAllTopSelling">View All</div>
+      <div v-if="formattedTopSellingProducts.length > 0">
+        <div class="flex items-end justify-between mb-1.5 mt-1">
+          <div class="text-[18px] font-bold text-black">Top Selling</div>
+          <div class="text-[11px] text-gray-700 cursor-pointer" @click="viewAllTopSelling">View All</div>
+        </div>
+        <!-- 商品宫格列表 -->
+        <ProductGrid :products="formattedTopSellingProducts" />
       </div>
-      <!-- 商品宫格列表 -->
-      <ProductGrid :products="formattedTopSellingProducts" />
+
+
     </template>
 
     <!-- 错误提示 -->

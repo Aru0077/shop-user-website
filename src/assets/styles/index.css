@@ -10,12 +10,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
   height: 100%;
-  background-color: #fff;
+  background-color: #FAFAFA;
   color: #323233;
   font-size: 14px;
+  box-sizing: border-box;
 }
 .pageContent{
-  padding:0px 15px 20px 15px;
+  padding:12px 15px 20px 15px;
   height: auto;
 }
 /* 修复底部安全区域 */

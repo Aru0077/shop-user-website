@@ -1,38 +1,83 @@
 <!-- src/views/product/ProductDetail.vue -->
 <template>
-    <div class="relative w-full overflow-hidden h-screen">
-
-        <!-- 顶部 Navbar -->
-        <div class="fixed top-0 left-0 right-0 w-full h-[60px] bg-transparent z-50">
-            <div class="nav-bar flex items-center justify-between box-border h-[60px] px-2 w-full">
-                <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
-                    <ChevronLeft @click="goBack"/>
+    <div class="flex flex-col h-full">
+        <!-- 顶部固定区 -->
+        <div class="flex-1 relative overflow-hidden">
+            <!-- 顶部固定 Navbar -->
+            <div class="absolute top-0 left-0 right-0 w-full h-[60px] bg-transparent z-50">
+                <div class="nav-bar flex items-center justify-between box-border h-[60px] px-2 w-full">
+                    <div
+                        class=" bg-slate-300 text-black bg-transparent  p-1 flex items-center justify-center rounded-full">
+                        <ChevronLeft @click="goBack" />
+                    </div>
+                    <div class="bg-slate-300 text-black p-1 flex items-center justify-center rounded-full"
+                        @click="navigatorToCart">
+                        <ShoppingCart />
+                        <!-- 购物车数量角标 -->
+                        <div v-if="uniqueItemCount > 0"
+                            class="absolute top-0.5 right-0.5 w-1 h-2 px-1 flex items-center justify-center bg-red-500 text-white text-[10px] rounded-full">
+                            {{ uniqueItemCount > 99 ? '99+' : uniqueItemCount }}
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+            </div>
+
+            <!-- 上下滚动内容区 -->
+            <div class="h-full overflow-y-auto">
+                <!-- 主图 -->
+                <div class=" z-10 relative">
+                    <van-image v-if="productDetail && productDetail.mainImage" :src="productDetail.mainImage"
+                        fit="cover" class="w-full aspect-square rounded-lg" />
+                </div>
+
+                <!-- 详情内容 -->
+                <div v-if="productDetail"
+                    class="absolute w-full h-auto bg-white -mt-2 z-20 rounded-t-lg py-3 px-2 box-border">
+
+                    <div class="flex items-center justify-between">
+                        <div class="text-[20px] font-bold">{{ productDetail.name }}</div>
+                        <div class="text-[16px] text-gray-500">sales: {{ productDetail.salesCount }}</div>
+                    </div>
+
+                    <div class="text-[16px] text-gray-500 mt-2 formatted-content">{{ productDetail.content }}</div>
+
+                    <div v-for="(item, index) in processedDetailImages" :key="index">
+                        <van-image :src="item" fit="cover" />
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- 底部操作区 -->
+        <div class="h-[70px] box-border pb-1 px-2 flex items-center justify-between">
+            <div class="flex items-center justify-around gap-1">
+                <div class=" bg-gray-200 text-black h-[50px] w-[50px] rounded-md box-border flex items-center justify-center"
+                    @click="handleToggleFavorite">
+                    <Heart :color="isProductFavorited ? '#FF4D4F' : 'black'"
+                        :fill="isProductFavorited ? '#FF4D4F' : 'none'" />
+                </div>
+                <div class=" bg-gray-200 text-black h-[50px] w-[50px] rounded-md box-border flex items-center justify-center"
+                    @click="handleToggleShare">
                     <Share2 />
                 </div>
+
             </div>
+
+            <div class="bg-black text-white flex justify-around items-center w-3/5 rounded-md h-[50px] px-2 box-border"
+                @click="openSkuSelector">
+                <ShoppingCart />
+                <div class="text-[20px] ">Add to cart</div>
+            </div>
+
         </div>
 
-        <!-- 上下滚动内容区 -->
-        <div class="absolute top-0 left-0 right-0 overflow-y-auto h-full">
-            <!-- 主图 -->
-            <div class=" z-10 relative">
-                <van-image v-if="productDetail && productDetail.mainImage" :src="productDetail.mainImage" fit="cover"
-                    class="w-full aspect-square rounded-lg" />
-            </div>
 
-            <!-- 详情内容 -->
-            <div v-if="productDetail"
-                class="absolute w-full h-auto bg-white -mt-2 z-20 rounded-t-lg py-2 px-2 box-border">
-                <div class="text-[20px] font-bold">{{ productDetail.name }}</div>
-
-                <!-- SKU选择组件 -->
-                <SkuSelector v-if="productDetail.specs && productDetail.skus" :specs="productDetail.specs"
-                    :skus="productDetail.skus" v-model:selection="selectedSpecs" @sku-change="handleSkuChange" />
-
-            </div>
-        </div>
+        <!-- SKU 选择器弹窗 -->
+        <SkuPopupSelector v-if="productDetail" v-model:visible="skuPopupVisible" :product="productDetail"
+            :initialSkuId="initialSkuId" @close="handlePopupClose" />
 
 
 
@@ -41,39 +86,117 @@
 </template>
 
 <script setup lang="ts">
-import { Share2, ChevronLeft } from 'lucide-vue-next'
+import { Share2, ChevronLeft, ShoppingCart, Heart } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { showToast, showSuccessToast } from 'vant';
 import { useProductStore } from '@/store/product.store';
 import { useFavoriteStore } from '@/store/favorite.store';
-import { useUserStore } from '@/store/user.store';
-import { formatPrice } from '@/utils/formatPrice';
-import type { ProductDetail as ProductDetailType, Sku } from '@/types/product.type';
-import SkuSelector from '@/components/product/SkuSelector.vue';
+import { useCartStore } from '@/store/cart.store';
+import { storeToRefs } from 'pinia'
+import SkuPopupSelector from '@/components/product/SkuPopupSelector.vue';
 
-// Initialize
+// 获取购物车store
+const cartStore = useCartStore()
+const { uniqueItemCount } = storeToRefs(cartStore);
+
+// 初始化
 const route = useRoute();
 const router = useRouter();
 const productStore = useProductStore();
 const favoriteStore = useFavoriteStore();
-const userStore = useUserStore();
 
 // State variables
 const loading = ref(true);
 const productId = computed(() => Number(route.params.id));
 const productDetail = computed(() => productStore.currentProduct);
-const quantity = ref(1);
-const selectedSpecs = ref<Record<number, number>>({});
-const isFavorited = computed(() => favoriteStore.isFavorite(productId.value));
 
-// 处理SKU变更
-const handleSkuChange = (sku) => {
-  console.log('选中的SKU:', sku);
-  // 更新价格、库存等信息
+// 弹窗组件状态 
+const skuPopupVisible = ref(false);
+const initialSkuId = ref<number | undefined>(undefined);
+
+// 添加收藏状态计算属性
+const isProductFavorited = computed(() => {
+    return favoriteStore.isFavorite(productId.value);
+});
+
+// 添加收藏切换方法
+const handleToggleFavorite = async () => {
+    if (!productId.value) return;
+
+    try {
+        await favoriteStore.toggleFavorite(productId.value);
+    } catch (error) {
+        console.error('切换收藏状态失败:', error);
+        showToast('操作失败，请稍后重试');
+    }
 };
 
-// Process detail images
+// 处理分享
+const handleToggleShare = () => {
+    console.log('分享商品');
+};
+
+// 打开SKU选择器
+const openSkuSelector = () => {
+    skuPopupVisible.value = true;
+};
+
+// 处理弹窗关闭
+const handlePopupClose = () => {
+    console.log('SKU选择弹窗已关闭');
+};
+
+
+// 加载商品详情
+const loadProductDetail = async (forceRefresh = false) => {
+    try {
+        loading.value = true;
+
+        // 判断是否已有数据且无需强制刷新
+        if (!forceRefresh && productDetail.value && productDetail.value.id === productId.value) {
+            loading.value = false;
+            return;
+        }
+
+        await productStore.loadProductDetail(productId.value);
+
+    } catch (error) {
+        console.error('获取商品详情失败:', error);
+        showToast('获取商品详情失败，请稍后重试');
+    } finally {
+        loading.value = false;
+    }
+};
+
+// Watch for product ID changes
+watch(() => productId.value, (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+        loadProductDetail();
+    }
+}, { immediate: false });
+
+// Lifecycle hooks
+onMounted(async () => {
+    document.title = '商品详情';
+    // 如果用户已登录但尚未加载收藏列表，则加载
+    if (favoriteStore.favoriteIds.length === 0) {
+        await favoriteStore.loadFavoriteIds();
+    }
+    loadProductDetail(false); // 默认不强制刷新，优先使用缓存 
+});
+
+onUnmounted(() => {
+    productStore.clearCurrentProduct();
+});
+
+// 返回上一页
+const goBack = () => {
+    router.back();
+};
+
+
+// 格式化 详情图片
 const processedDetailImages = computed(() => {
     if (!productDetail.value || !productDetail.value.detailImages) return [];
 
@@ -96,202 +219,20 @@ const processedDetailImages = computed(() => {
     }
 });
 
-// Category name
-const categoryName = computed(() => {
-    if (!productDetail.value || !productDetail.value.category) return '未分类';
-    return productDetail.value.category.name || '未分类';
-});
-
-// Get selected SKU
-const selectedSku = computed<Sku | null>(() => {
-    if (!productDetail.value || !productDetail.value.skus || productDetail.value.skus.length === 0) {
-        return null;
-    }
-
-    // If no specs or specs not selected, return first SKU
-    if (!productDetail.value.specs || productDetail.value.specs.length === 0 ||
-        Object.keys(selectedSpecs.value).length === 0) {
-        return productDetail.value.skus[0];
-    }
-
-    // Find matching SKU based on selected specs
-    const matchingSku = productDetail.value.skus.find(sku => {
-        if (!sku.sku_specs || sku.sku_specs.length === 0) return false;
-
-        // Check if all selected specs match this SKU
-        return sku.sku_specs.every(spec =>
-            selectedSpecs.value[spec.specId] === spec.specValueId
-        );
-    });
-
-    return matchingSku || productDetail.value.skus[0];
-});
-
-// Display price
-const displayPrice = computed(() => {
-    if (selectedSku.value) {
-        return selectedSku.value.promotion_price !== undefined && selectedSku.value.promotion_price > 0
-            ? selectedSku.value.promotion_price
-            : selectedSku.value.price;
-    }
-    return 0;
-});
-
-// Original price
-const originalPrice = computed(() => {
-    if (selectedSku.value && selectedSku.value.price) {
-        return selectedSku.value.price;
-    }
-    return 0;
-});
-
-// Check if product has promotion
-const hasPromotion = computed(() => {
-    return selectedSku.value &&
-        selectedSku.value.promotion_price !== undefined &&
-        selectedSku.value.promotion_price > 0 &&
-        selectedSku.value.promotion_price < selectedSku.value.price;
-});
-
-// Available stock
-const availableStock = computed(() => {
-    if (selectedSku.value && selectedSku.value.stock !== undefined) {
-        const stock = selectedSku.value.stock;
-        const lockedStock = selectedSku.value.lockedStock || 0;
-        return Math.max(0, stock - lockedStock);
-    }
-    return 0;
-});
-
-// Select specification
-const selectSpec = (specId: number, valueId: number) => {
-    selectedSpecs.value = { ...selectedSpecs.value, [specId]: valueId };
-};
-
-// Add to cart
-const addToCart = () => {
-    if (!userStore.isLoggedIn) {
-        showToast('请先登录');
-        router.push({ path: '/login', query: { redirect: route.fullPath } });
-        return;
-    }
-
-    if (!selectedSku.value) {
-        showToast('请选择商品规格');
-        return;
-    }
-
-    if (availableStock.value <= 0) {
-        showToast('商品库存不足');
-        return;
-    }
-
-    // Call add to cart API (placeholder)
-    showSuccessToast('已加入购物车');
-};
-
-// Buy now
-const buyNow = () => {
-    if (!userStore.isLoggedIn) {
-        showToast('请先登录');
-        router.push({ path: '/login', query: { redirect: route.fullPath } });
-        return;
-    }
-
-    if (!selectedSku.value) {
-        showToast('请选择商品规格');
-        return;
-    }
-
-    if (availableStock.value <= 0) {
-        showToast('商品库存不足');
-        return;
-    }
-
-    // Navigate to checkout (placeholder)
-    router.push('/payment');
-};
-
-// Toggle favorite
-const toggleFavorite = async () => {
-    if (!userStore.isLoggedIn) {
-        showToast('请先登录');
-        router.push({ path: '/login', query: { redirect: route.fullPath } });
-        return;
-    }
-
-    try {
-        const result = await favoriteStore.toggleFavorite(productId.value);
-        if (result) {
-            showSuccessToast(isFavorited.value ? '已取消收藏' : '已加入收藏');
-        }
-    } catch (error) {
-        console.error('收藏操作失败:', error);
-        showToast('操作失败，请稍后重试');
-    }
-};
-
-// Go to cart
-const goToCart = () => {
+// 跳转购物车
+const navigatorToCart = () => {
     router.push('/cart');
 };
-
-// Load product detail
-// 加载商品详情
-const loadProductDetail = async (forceRefresh = false) => {
-    try {
-        loading.value = true;
-
-        // 判断是否已有数据且无需强制刷新
-        if (!forceRefresh && productDetail.value && productDetail.value.id === productId.value) {
-            loading.value = false;
-            return;
-        }
-
-        await productStore.loadProductDetail(productId.value);
-
-        // 初始化规格选择
-        if (productDetail.value && productDetail.value.specs) {
-            productDetail.value.specs.forEach(spec => {
-                if (spec.values && spec.values.length > 0) {
-                    selectedSpecs.value[spec.id] = spec.values[0].id;
-                }
-            });
-        }
-    } catch (error) {
-        console.error('获取商品详情失败:', error);
-        showToast('获取商品详情失败，请稍后重试');
-    } finally {
-        loading.value = false;
-    }
-};
-
-// Watch for product ID changes
-watch(() => productId.value, (newVal, oldVal) => {
-    if (newVal !== oldVal) {
-        loadProductDetail();
-    }
-}, { immediate: false });
-
-// Lifecycle hooks
-onMounted(() => {
-    document.title = '商品详情';
-    loadProductDetail(false); // 默认不强制刷新，优先使用缓存 
-});
-
-onUnmounted(() => {
-    productStore.clearCurrentProduct();
-});
-
-// 返回上一页
-const goBack = () => {
-    router.back();
-};
-
 
 </script>
 
 <style scoped>
+.formatted-content {
+    white-space: pre-line;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
 .nav-bar {
     /* 处理iOS安全区 */
     padding-top: env(safe-area-inset-top);

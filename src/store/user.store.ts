@@ -1,12 +1,18 @@
 // src/store/user.store.ts
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { login as loginApi, logout as logoutApi, deleteAccount as deleteAccountApi } from '@/api/user.api';
-import { UserInfo, LoginParams, DeleteAccountParams } from '@/types/user.type';
+import {
+    loginApi,
+    logoutApi,
+    deleteAccountApi,
+    registerApi
+} from '@/api/user.api';
+import { UserInfo, LoginParams, DeleteAccountParams, RegisterParams } from '@/types/user.type';
 import { saveTokens, getAccessToken, clearTokens } from '@/utils/tokenManager';
 import storage from '@/utils/storage';
 import { useFavoriteStore } from '@/store/favorite.store';
 import { useAddressStore } from '@/store/address.store';
+import { useCartStore } from '@/store/cart.store';
 
 // 本地存储键名定义
 const USER_INFO_KEY = 'USER_INFO';
@@ -49,10 +55,12 @@ export const useUserStore = defineStore('user', () => {
             // 同时加载用户相关数据
             const favoriteStore = useFavoriteStore();
             const addressStore = useAddressStore();
+            const cartStore = useCartStore();
 
             await Promise.all([
                 favoriteStore.loadFavoriteIds(),
-                addressStore.loadAddresses()
+                addressStore.loadAddresses(),
+                cartStore.loadCartList() ,
             ]);
 
             isInitialized.value = true;
@@ -60,6 +68,17 @@ export const useUserStore = defineStore('user', () => {
         } catch (error) {
             console.error('初始化用户数据失败:', error);
             // 初始化失败，但不影响主流程，所以不抛出异常
+        }
+    }
+
+    // 用户注册
+    async function register(registerData: RegisterParams) {
+        try {
+            const res = await registerApi(registerData);
+            return Promise.resolve(res);
+        } catch (error) {
+            console.error('注册失败:', error);
+            return Promise.reject(error);
         }
     }
 
@@ -79,11 +98,13 @@ export const useUserStore = defineStore('user', () => {
             // 登录成功后加载用户相关数据
             const favoriteStore = useFavoriteStore();
             const addressStore = useAddressStore();
+            const cartStore = useCartStore();
 
             // 使用Promise.all并行加载数据，提高效率
             await Promise.all([
                 favoriteStore.loadFavoriteIds(),
-                addressStore.loadAddresses()
+                addressStore.loadAddresses(),
+                cartStore.loadCartList() ,
             ]);
 
             isInitialized.value = true;
@@ -108,9 +129,11 @@ export const useUserStore = defineStore('user', () => {
             // 清空其他Store的数据
             const favoriteStore = useFavoriteStore();
             const addressStore = useAddressStore();
+            const cartStore = useCartStore();
 
             favoriteStore.resetFavorites();
             addressStore.clearAddresses();
+            cartStore.resetCart();
 
             console.log('✅ 用户已登出，所有数据已清除');
             return Promise.resolve(true);
@@ -168,6 +191,7 @@ export const useUserStore = defineStore('user', () => {
 
         // 方法
         getAuthToken,
+        register,
         login,
         logout,
         deleteAccount,

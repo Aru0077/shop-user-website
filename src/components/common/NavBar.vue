@@ -1,59 +1,52 @@
 <!-- src/components/common/NavBar.vue -->
 <template>
-      <div class="nav-bar flex items-center justify-between box-border h-[60px] px-2 w-full"
+      <div class="nav-bar flex items-center justify-between box-border h-[60px] px-2 w-full shadow-sm"
             :class="{ 'bg-white backdrop-blur-md shadow-sm': showBackground, 'bg-transparent': !showBackground }">
             <!-- 左侧按钮 -->
             <div class="flex items-center">
 
-                  <template v-if="leftBtn === 'back'">
-                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
-                              <ChevronLeft @click="handleLeftClick('back')"/>
+                  <!-- 显示logo -->
+                  <template v-if="leftBtn === 'logo'">
+                        <div
+                              class="flex items-center justify-center rounded-full w-[40px] h-[40px] shadow-lg bg-gray-100">
+                              <van-image :src="logoImg" fit="cover" width="30px" height="30px" />
                         </div>
                   </template>
 
-                  <template v-else-if="leftBtn === 'home'">
+                  <!-- 显示返回按钮 -->
+                  <template v-if="leftBtn === 'back'">
                         <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
-                              <Home @click="handleLeftClick('home')"/>
-                        </div> 
-                  </template>
-
-                  <template v-else-if="leftBtn === 'category'">
-                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
-                              <LayoutGrid @click="handleLeftClick('close')"/>
-                        </div> 
-                  </template>
-
-                  <template v-else-if="leftBtn === 'cart'">
-                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
-                              <ShoppingCart @click="handleLeftClick('close')"/>
-                        </div> 
-                  </template>
-
-                  <template v-else-if="leftBtn === 'user'">
-                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
-                              <User @click="handleLeftClick('close')"/>
-                        </div> 
+                              <ChevronLeft @click="handleLeftClick('back')" />
+                        </div>
                   </template>
 
             </div>
 
             <!-- 右侧按钮 -->
             <div class="flex items-center">
-                  <template v-if="rightBtn === 'more'">
-                        <MoreHorizontal @click="handleRightClick('more')"
-                              class="bg-black text-white p-1 rounded-full w-2 h-2 flex items-center justify-center cursor-pointer" />
+
+                  <!-- 显示购物车 -->
+                  <template v-if="rightBtn === 'cart'">
+                        <div
+                              class="flex items-center justify-center rounded-full w-[40px] h-[40px] shadow-lg bg-gray-100">
+                              <ShoppingCart @click="handleShoppingCart" />
+                              <!-- 购物车数量角标 -->
+                              <div v-if="uniqueItemCount > 0"
+                                    class="absolute top-0.5 right-0.5 w-1 h-2 px-1 flex items-center justify-center bg-red-500 text-white text-[10px] rounded-full">
+                                    {{ uniqueItemCount > 99 ? '99+' : uniqueItemCount }}
+                              </div>
+                        </div>
                   </template>
-                  <template v-else-if="rightBtn === 'search'">
-                        <Search @click="handleRightClick('search')"
-                              class="bg-black text-white p-1 rounded-full w-2 h-2 flex items-center justify-center cursor-pointer" />
+
+
+                  <!-- 显示添加按钮 -->
+                  <template v-else-if="rightBtn === 'add'">
+                        <div class="bg-black text-white p-1 flex items-center justify-center rounded-full">
+                              <Plus @click="handleRightClick('back')" />
+                        </div>
                   </template>
-                  <template v-else-if="rightBtn === 'share'">
-                        <Share2 @click="handleRightClick('share')"
-                              class="bg-black text-white p-1 rounded-full w-2 h-2 flex items-center justify-center cursor-pointer" />
-                  </template>
-                  <template v-else-if="rightBtn === 'custom'">
-                        <slot name="right"></slot>
-                  </template>
+
+
             </div>
       </div>
 </template>
@@ -66,8 +59,15 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { Home, X, MoreHorizontal, Search, Share2, ChevronLeft, LayoutGrid, ShoppingCart, User } from 'lucide-vue-next'
+import logoImg from '@/assets/images/unimall.png'
+import { Plus, ChevronLeft, ShoppingCart } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
+import { useCartStore } from '@/store/cart.store'
+import { storeToRefs } from 'pinia'
+
+// 获取购物车store
+const cartStore = useCartStore()
+const { uniqueItemCount } = storeToRefs(cartStore)
 
 // 定义属性
 defineProps({
@@ -77,11 +77,11 @@ defineProps({
       },
       leftBtn: {
             type: String,
-            default: 'back' // 'back', 'home', 'category', 'cart', 'user'
+            default: 'logo' // 'back', 'logo', 
       },
       rightBtn: {
             type: String,
-            default: 'none' // 'more', 'search', 'share', 'custom', 'none'
+            default: 'none' // 'cart', 'add', 'none'
       },
       showBackground: {
             type: Boolean,
@@ -111,11 +111,28 @@ const handleLeftClick = (type) => {
 const handleRightClick = (type) => {
       emit('right-click', { type })
 }
+
+
+const handleShoppingCart = () => {
+      router.push('/cart')
+}
+
+
 </script>
 
 <style scoped>
 .nav-bar {
       /* 处理iOS安全区 */
       padding-top: env(safe-area-inset-top);
+}
+
+.logo {
+      width: 40px;
+      height: 40px;
+      /* border: 1px solid gray; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
 }
 </style>

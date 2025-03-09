@@ -8,9 +8,9 @@ import { Icon } from "@iconify/vue";
 import { useProductStore } from './store/product.store';
 import { formatPrice } from './utils/formatPrice'; 
 
-// 导入全局样式
-import './assets/styles/tailwind.css'
+// 导入全局样式 
 import './assets/styles/index.css'
+import './assets/styles/tailwind.css'
 
 // 移动端适配
 import 'amfe-flexible'

@@ -2,14 +2,27 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import {
-  createOrder as createOrderApi,
-  getOrderList as getOrderListApi,
-  getOrderDetail as getOrderDetailApi,
-  payOrder as payOrderApi
+  createOrderApi,
+  getOrderListApi,
+  getOrderDetailApi,
+  payOrderApi
 } from '@/api/order.api';
 import { Order, OrderStatus, CreateOrderParams, PayOrderParams } from '@/types/order.type';
+import { CartItem } from '@/types/cart.type';
+import { Address } from '@/types/address.type';
 import { useUserStore } from './user.store';
 import { showNotify, showLoadingToast, closeToast } from 'vant';
+
+
+// 添加订单草稿接口
+interface OrderDraft {
+  cartItems: CartItem[];
+  address: Address;
+  totalAmount: number;
+  cartItemIds: number[];
+  createdAt: number; // 添加时间戳以便实现过期逻辑
+}
+
 
 export const useOrderStore = defineStore('order', () => {
   // 状态
@@ -19,6 +32,9 @@ export const useOrderStore = defineStore('order', () => {
   const page = ref<number>(1);
   const limit = ref<number>(10);
   const loading = ref<boolean>(false);
+  // 添加订单草稿状态
+  const draftOrder = ref<OrderDraft | null>(null);
+
 
   // 计算属性
   const pendingPaymentOrders = computed(() => {
@@ -36,6 +52,58 @@ export const useOrderStore = defineStore('order', () => {
   const completedOrders = computed(() => {
     return orders.value.filter(order => order.orderStatus === OrderStatus.COMPLETED);
   });
+
+  // 设置订单草稿
+  function setOrderDraft(draft: Omit<OrderDraft, 'createdAt'>) {
+    draftOrder.value = {
+      ...draft,
+      createdAt: Date.now()
+    };
+  };
+
+  // 获取订单草稿
+  function getOrderDraft() {
+    // 可以在这里添加过期检查逻辑
+    if (draftOrder.value && Date.now() - draftOrder.value.createdAt > 30 * 60 * 1000) {
+      // 如果草稿超过30分钟，清除它
+      clearOrderDraft();
+      return null;
+    }
+    return draftOrder.value;
+  };
+
+  // 清除订单草稿
+  function clearOrderDraft() {
+    draftOrder.value = null;
+  };
+
+  // 从草稿创建订单
+  async function createOrderFromDraft() {
+    const userStore = useUserStore();
+    if (!userStore.isLoggedIn) return null;
+
+    // 检查草稿是否存在
+    const draft = getOrderDraft();
+    if (!draft) return null;
+
+    try {
+      // 创建订单参数
+      const params: CreateOrderParams = {
+        addressId: draft.address.id,
+        cartItemIds: draft.cartItemIds,
+        remark: ''
+      };
+
+      // 调用创建订单API
+      const res = await createOrderApi(params);
+      currentOrder.value = res.data;
+      return res.data;
+    } catch (error) {
+      console.error('从草稿创建订单失败:', error);
+      return null;
+    }
+  };
+
 
   // 创建订单
   const createOrder = async (data: CreateOrderParams) => {
@@ -161,6 +229,7 @@ export const useOrderStore = defineStore('order', () => {
     page,
     limit,
     loading,
+    draftOrder,
 
     // 计算属性
     pendingPaymentOrders,
@@ -169,6 +238,10 @@ export const useOrderStore = defineStore('order', () => {
     completedOrders,
 
     // 方法
+    setOrderDraft,
+    getOrderDraft,
+    clearOrderDraft,
+    createOrderFromDraft,
     createOrder,
     loadOrderList,
     loadOrderDetail,

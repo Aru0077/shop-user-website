@@ -13,14 +13,14 @@ import {
 /**
  * 获取分类树
  */
-export function getCategoryTree() {
+export function getCategoryTreeApi() {
       return get<ApiResponse<Category[]>>('/products/categories/tree');
 }
 
 /**
  * 获取首页数据
  */
-export function getHomePageData() {
+export function getHomePageDataApi() {
       return get<ApiResponse<HomeData>>('/products/home-data');
 }
 
@@ -29,7 +29,7 @@ export function getHomePageData() {
  * @param page 页码
  * @param limit 每页数量
  */
-export function getLatestProducts(page = 1, limit = 10) {
+export function getLatestProductsApi(page = 1, limit = 10) {
       return get<ApiResponse<ProductListResponse>>('/products/latest', { page, limit });
 }
 
@@ -38,7 +38,7 @@ export function getLatestProducts(page = 1, limit = 10) {
  * @param page 页码
  * @param limit 每页数量
  */
-export function getTopSellingProducts(page = 1, limit = 10) {
+export function getTopSellingProductsApi(page = 1, limit = 10) {
       return get<ApiResponse<ProductListResponse>>('/products/top-selling', { page, limit });
 }
 
@@ -47,7 +47,7 @@ export function getTopSellingProducts(page = 1, limit = 10) {
  * @param page 页码
  * @param limit 每页数量
  */
-export function getPromotionProducts(page = 1, limit = 10) {
+export function getPromotionProductsApi(page = 1, limit = 10) {
       return get<ApiResponse<ProductListResponse>>('/products/promotion', { page, limit });
 }
 
@@ -58,7 +58,7 @@ export function getPromotionProducts(page = 1, limit = 10) {
  * @param limit 每页数量
  * @param sort 排序方式
  */
-export function getCategoryProducts(
+export function getCategoryProductsApi(
       categoryId: number,
       page = 1,
       limit = 10,
@@ -77,7 +77,7 @@ export function getCategoryProducts(
  * @param page 页码
  * @param limit 每页数量
  */
-export function searchProducts(keyword: string, page = 1, limit = 10) {
+export function searchProductsApi(keyword: string, page = 1, limit = 10) {
       return get<ApiResponse<ProductListResponse>>('/products/search', {
             keyword,
             page,
@@ -89,6 +89,6 @@ export function searchProducts(keyword: string, page = 1, limit = 10) {
  * 获取商品详情
  * @param id 商品ID
  */
-export function getProductDetail(id: number) {
+export function getProductDetailApi(id: number) {
       return get<ApiResponse<ProductDetail>>(`/products/${id}`);
 }

@@ -2,14 +2,14 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import {
-      getCategoryTree,
-      getHomePageData as getHomeDataApi,
-      getLatestProducts,
-      getTopSellingProducts,
-      getPromotionProducts,
-      getCategoryProducts,
-      getProductDetail,
-      searchProducts
+      getCategoryTreeApi,
+      getHomePageDataApi,
+      getLatestProductsApi,
+      getTopSellingProductsApi,
+      getPromotionProductsApi,
+      getCategoryProductsApi,
+      getProductDetailApi,
+      searchProductsApi
 } from '@/api/product.api';
 import {
       Category,
@@ -118,7 +118,7 @@ export const useProductStore = defineStore('product', () => {
 
             try {
                   loading.value = true;
-                  const res = await getCategoryTree();
+                  const res = await getCategoryTreeApi();
                   categories.value = res.data;
 
                   // 存入缓存
@@ -152,7 +152,7 @@ export const useProductStore = defineStore('product', () => {
 
             try {
                   loading.value = true;
-                  const res = await getHomeDataApi();
+                  const res = await getHomePageDataApi();
                   homeData.value = res.data;
 
                   // 存入缓存
@@ -172,7 +172,7 @@ export const useProductStore = defineStore('product', () => {
       async function loadLatestProducts(page = 1, limit = 10) {
             try {
                   loading.value = true;
-                  const res = await getLatestProducts(page, limit);
+                  const res = await getLatestProductsApi(page, limit);
                   const data = res.data;
 
                   latestProducts.value = data.data;
@@ -191,7 +191,7 @@ export const useProductStore = defineStore('product', () => {
       async function loadTopSellingProducts(page = 1, limit = 10) {
             try {
                   loading.value = true;
-                  const res = await getTopSellingProducts(page, limit);
+                  const res = await getTopSellingProductsApi(page, limit);
                   const data = res.data;
 
                   topSellingProducts.value = data.data;
@@ -210,7 +210,7 @@ export const useProductStore = defineStore('product', () => {
       async function loadPromotionProducts(page = 1, limit = 10) {
             try {
                   loading.value = true;
-                  const res = await getPromotionProducts(page, limit);
+                  const res = await getPromotionProductsApi(page, limit);
                   const data = res.data;
 
                   promotionProducts.value = data.data;
@@ -241,7 +241,7 @@ export const useProductStore = defineStore('product', () => {
                         currentCategory.value = category;
                   }
 
-                  const res = await getCategoryProducts(categoryId, page, limit, sort);
+                  const res = await getCategoryProductsApi(categoryId, page, limit, sort);
                   const data = res.data;
 
                   categoryProducts.value = data.data;
@@ -269,7 +269,7 @@ export const useProductStore = defineStore('product', () => {
 
             try {
                   loading.value = true;
-                  const res = await getProductDetail(id);
+                  const res = await getProductDetailApi(id);
                   currentProduct.value = res.data;
                   // 存入缓存
                   storage.set(cacheKey, res.data, CACHE_EXPIRY.PRODUCT_DETAIL);
@@ -346,7 +346,7 @@ export const useProductStore = defineStore('product', () => {
                         case 'search':
                               if (params.keyword) {
                                     // 使用搜索API（需要提前导入）
-                                    const res = await searchProducts(params.keyword, page, limit);
+                                    const res = await searchProductsApi(params.keyword, page, limit);
                                     const data = res.data;
                                     result = data.data;
                                     updatePaginationInfo(data);

@@ -1,6 +1,6 @@
 <!-- src/components/home/Banner.vue -->
 <template>
-      <div class="relative h-[160px] rounded-[20px] overflow-hidden cursor-pointer" @click="handleBannerClick">
+      <div class="relative h-[160px] rounded-[20px] overflow-hidden cursor-pointer shadow-lg" @click="handleBannerClick">
             <!-- 背景图片 -->
             <OptimizedImage :src="imageUrl" :alt="title" priority="high" image-class="w-full h-full" objectFit="cover"
                   :fixedHeight="true" />

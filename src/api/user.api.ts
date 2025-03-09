@@ -13,7 +13,7 @@ import {
  * 用户注册
  * @param data 注册信息
  */
-export function register(data: RegisterParams) {
+export function registerApi(data: RegisterParams) {
       return post<ApiResponse<UserInfo>>('/user/register', data);
 }
 
@@ -21,14 +21,14 @@ export function register(data: RegisterParams) {
  * 用户登录
  * @param data 登录信息
  */
-export function login(data: LoginParams) {
+export function loginApi(data: LoginParams) {
       return post<ApiResponse<LoginResponseData>>('/user/login', data);
 }
 
 /**
  * 用户登出
  */
-export function logout() {
+export function logoutApi() {
       return post<ApiResponse<null>>('/user/logout');
 }
 
@@ -36,6 +36,6 @@ export function logout() {
  * 删除账号
  * @param data 删除账号请求数据（包含密码）
  */
-export function deleteAccount(data: DeleteAccountParams) {
+export function deleteAccountApi(data: DeleteAccountParams) {
       return del<ApiResponse<null>>('/user/account', { data });
 }

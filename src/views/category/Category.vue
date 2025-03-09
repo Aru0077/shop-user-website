@@ -96,7 +96,7 @@ onMounted(() => {
     border-radius: 8px;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 10px  rgba(0, 0, 0, 0.1);
 }
 
 /* 加快折叠面板展开速度 */

@@ -8,15 +8,18 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddressSelector: typeof import('./src/components/common/AddressSelector.vue')['default']
     Banner: typeof import('./src/components/home/Banner.vue')['default']
     CustomTabBar: typeof import('./src/components/common/CustomTabBar.vue')['default']
     ListProductView: typeof import('./src/components/product/ListProductView.vue')['default']
     NavBar: typeof import('./src/components/common/NavBar.vue')['default']
     OptimizedImage: typeof import('./src/components/common/OptimizedImage.vue')['default']
+    OrderItemCard: typeof import('./src/components/order/OrderItemCard.vue')['default']
     ProductGrid: typeof import('./src/components/product/ProductGrid.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./src/components/home/SearchBar.vue')['default']
+    SkuPopupSelector: typeof import('./src/components/product/SkuPopupSelector.vue')['default']
     SkuSelector: typeof import('./src/components/product/SkuSelector.vue')['default']
     TabBar: typeof import('./src/components/layout/TabBar.vue')['default']
     VanButton: typeof import('vant/es')['Button']
@@ -29,6 +32,8 @@ declare module 'vue' {
     VanEmpty: typeof import('vant/es')['Empty']
     VanField: typeof import('vant/es')['Field']
     VanForm: typeof import('vant/es')['Form']
+    VanGrid: typeof import('vant/es')['Grid']
+    VanGridItem: typeof import('vant/es')['GridItem']
     VanIcon: typeof import('vant/es')['Icon']
     VanImage: typeof import('vant/es')['Image']
     VanLoading: typeof import('vant/es')['Loading']
@@ -37,7 +42,9 @@ declare module 'vue' {
     VanPopup: typeof import('vant/es')['Popup']
     VanPullRefresh: typeof import('vant/es')['PullRefresh']
     VanStepper: typeof import('vant/es')['Stepper']
+    VanTab: typeof import('vant/es')['Tab']
     VanTabbar: typeof import('vant/es')['Tabbar']
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
+    VanTabs: typeof import('vant/es')['Tabs']
   }
 }

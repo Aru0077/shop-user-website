@@ -2,7 +2,7 @@
 <template>
     <div class="pageContent">
         <div class="px-[5px]">
-            <div class="text-[20px] font-bold leading-4 text-black">
+            <div class="text-[25px] font-bold leading-4 text-black">
                 {{ isEditMode ? 'Edit Address' : 'Add New Address' }}
             </div>
         </div>
