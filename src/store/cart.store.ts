@@ -6,7 +6,8 @@ import {
       updateCartItemApi,
       deleteCartItemApi,
       getCartListApi,
-      clearCartApi
+      clearCartApi,
+      previewOrderAmountApi
 } from '@/api/cart.api';
 import { CartItem, AddCartItemParams, UpdateCartItemParams } from '@/types/cart.type';
 import { useUserStore } from './user.store';
@@ -324,6 +325,38 @@ export const useCartStore = defineStore('cart', () => {
             }
       };
 
+      // 在结算前预览订单金额（包含满减优惠）
+      // 在结算前预览订单金额（包含满减优惠）
+      const previewOrderAmount = async (cartItemIds: number[]) => {
+            if (cartItemIds.length === 0) {
+                  return {
+                        totalAmount: 0,
+                        discountAmount: 0,
+                        paymentAmount: 0,
+                        promotion: null,
+                        cartItems: []
+                  };
+            }
+
+            // 显示加载状态
+            showLoadingToast({ message: '计算中...' });
+
+            try {
+                  // 先同步购物车以确保数据最新
+                  await syncCartBeforeCheckout();
+
+                  // 调用预览API
+                  const res = await previewOrderAmountApi(cartItemIds);
+                  closeToast();
+                  return res.data;
+            } catch (error) {
+                  closeToast();
+                  console.error('获取订单预览失败:', error);
+                  showNotify({ type: 'warning', message: '计算订单金额失败' });
+                  return null;
+            }
+      };
+
 
       return {
             // 状态
@@ -349,7 +382,8 @@ export const useCartStore = defineStore('cart', () => {
             removeCartItem,
             clearAllCart,
             resetCart,
-            syncCartItem
+            syncCartItem,
+            previewOrderAmount
       };
 }, {
       persist: true // 添加持久化配置

@@ -19,7 +19,7 @@ export interface Product {
       name: string;
       content?: string;
       mainImage?: string;
-      detailImages?: any;
+      detailImages?: string[];
       is_promotion?: number;
       status: ProductStatus;
       productCode: string;

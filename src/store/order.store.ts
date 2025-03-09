@@ -105,7 +105,7 @@ export const useOrderStore = defineStore('order', () => {
   };
 
 
-  // 创建订单
+  // 创建订单 
   const createOrder = async (data: CreateOrderParams) => {
     const userStore = useUserStore();
     if (!userStore.isLoggedIn) return null;
@@ -118,6 +118,10 @@ export const useOrderStore = defineStore('order', () => {
     try {
       const res = await createOrderApi(data);
       currentOrder.value = res.data;
+
+      // 添加以下代码，清除订单草稿
+      clearOrderDraft();
+
       closeToast();
       showNotify({ type: 'success', message: '订单创建成功' });
       return res.data;

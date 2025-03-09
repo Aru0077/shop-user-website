@@ -5,7 +5,8 @@ import {
       CartItem,
       CartListResponse,
       AddCartItemParams,
-      UpdateCartItemParams
+      UpdateCartItemParams,
+      OrderPreviewResponse
 } from '@/types/cart.type';
 import { AxiosRequestConfig } from 'axios';
 
@@ -15,11 +16,11 @@ import { AxiosRequestConfig } from 'axios';
  */
 export function addToCartApi(data: AddCartItemParams, config?: AxiosRequestConfig) {
       // 合并配置，确保loading为false
-      return post<ApiResponse<CartItem>>('/cart', data, { 
-        ...config, 
-        loading: false 
+      return post<ApiResponse<CartItem>>('/cart', data, {
+            ...config,
+            loading: false
       });
-    }
+}
 
 /**
  * 更新购物车商品数量
@@ -27,7 +28,7 @@ export function addToCartApi(data: AddCartItemParams, config?: AxiosRequestConfi
  * @param data 更新参数
  */
 export function updateCartItemApi(id: number, data: UpdateCartItemParams, config?: AxiosRequestConfig) {
-      return put<ApiResponse<CartItem>>(`/cart/${id}`, data,{
+      return put<ApiResponse<CartItem>>(`/cart/${id}`, data, {
             ...config,
             loading: false
       });
@@ -38,7 +39,7 @@ export function updateCartItemApi(id: number, data: UpdateCartItemParams, config
  * @param id 购物车项ID
  */
 export function deleteCartItemApi(id: number, config?: AxiosRequestConfig) {
-      return del<ApiResponse<null>>(`/cart/${id}` , {
+      return del<ApiResponse<null>>(`/cart/${id}`, {
             ...config,
             loading: false
       });
@@ -64,3 +65,11 @@ export function getCartListApi(params?: {
 export function clearCartApi() {
       return del<ApiResponse<null>>('/cart/clear');
 }
+
+/**
+ * 预览订单金额（包含满减优惠）
+ * @param cartItemIds 购物车项ID数组
+ */
+export function previewOrderAmountApi(cartItemIds: number[]) {
+      return post<ApiResponse<OrderPreviewResponse>>('/cart/preview', { cartItemIds });
+    }

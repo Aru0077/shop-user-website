@@ -69,5 +69,36 @@ export interface CartListResponse {
       data: CartItem[];
 }
 
+/**
+ * 订单预览响应数据
+ */
+export interface OrderPreviewResponse {
+      totalAmount: number;          // 总金额
+      discountAmount: number;       // 折扣金额
+      paymentAmount: number;        // 实际支付金额
+      promotion: {
+            id: number;
+            name: string;
+            type: string;
+            thresholdAmount: number;
+            discountAmount: number;
+      } | null;                     // 适用的促销规则
+      cartItems: Array<{
+            id: number;
+            quantity: number;
+            skuId: number;
+            productId: number;
+            unitPrice: number;
+      }>;                           // 购物车项详情
+}
+
+/**
+ * 预览订单请求参数
+ */
+export interface PreviewOrderParams {
+      cartItemIds: number[];
+}
+
+
 // 导出API响应类型，以便于在cart.api.ts中使用
 export type { ApiResponse };

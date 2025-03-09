@@ -73,6 +73,15 @@ export interface Order {
       orderItems: OrderItem[];
       paymentLogs?: PaymentLog[];
       timeoutSeconds?: number | null;
+      promotionId?: number;
+      discountAmount: number;
+      promotion?: {
+            id: number;
+            name: string;
+            type: string;
+            thresholdAmount: number;
+            discountAmount: number;
+      };
 }
 
 /**

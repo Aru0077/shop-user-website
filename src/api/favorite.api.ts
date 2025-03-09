@@ -15,10 +15,10 @@ import { AxiosRequestConfig } from 'axios';
  * @param data 收藏参数
  */
 export function addFavoriteApi(data: AddFavoriteParams, config?: AxiosRequestConfig) {
-    return post<ApiResponse<null>>('/favorites', data , {
+    return post<ApiResponse<null>>('/favorites', data, {
         ...config,
         loading: false
-  });
+    });
 }
 
 /**
@@ -29,7 +29,7 @@ export function removeFavoriteApi(productId: number, config?: AxiosRequestConfig
     return del<ApiResponse<null>>(`/favorites/${productId}`, {
         ...config,
         loading: false
-  });
+    });
 }
 
 /**
@@ -66,4 +66,15 @@ export function getFavoriteIdsApi() {
  */
 export function isFavoriteApi(productId: number, favoriteIds: number[]): boolean {
     return favoriteIds.includes(productId);
+}
+
+// 切换商品收藏状态
+export async function toggleFavoriteApi(productId: number, config?: AxiosRequestConfig) {
+    const res = await getFavoriteIdsApi();
+    const favoriteIds = res.data.data;
+    if (favoriteIds.includes(productId)) {
+        return removeFavoriteApi(productId, config);
+    } else {
+        return addFavoriteApi({ productId }, config);
+    }
 }
