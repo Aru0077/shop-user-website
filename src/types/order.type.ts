@@ -52,7 +52,7 @@ export const PaymentStatusText = {
 
 /**
  * 订单接口
- */
+ */ 
 export interface Order {
       id: string;
       orderNo: string;
@@ -68,20 +68,20 @@ export interface Order {
       };
       totalAmount: number;
       paymentAmount: number;
+      discountAmount: number;
+      promotionId?: number;
+      promotion?: {
+            id: number;
+            name: string;
+            type: string; // 'AMOUNT_OFF' 或 'PERCENT_OFF'
+            thresholdAmount: number;
+            discountAmount: number;
+      };
       createdAt: string;
       updatedAt: string;
       orderItems: OrderItem[];
       paymentLogs?: PaymentLog[];
-      timeoutSeconds?: number | null;
-      promotionId?: number;
-      discountAmount: number;
-      promotion?: {
-            id: number;
-            name: string;
-            type: string;
-            thresholdAmount: number;
-            discountAmount: number;
-      };
+      timeoutSeconds?: number | null; // 添加倒计时字段，匹配后端返回
 }
 
 /**

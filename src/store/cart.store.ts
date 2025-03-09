@@ -325,8 +325,7 @@ export const useCartStore = defineStore('cart', () => {
             }
       };
 
-      // 在结算前预览订单金额（包含满减优惠）
-      // 在结算前预览订单金额（包含满减优惠）
+      // 在结算前预览订单金额（包含满减优惠） 
       const previewOrderAmount = async (cartItemIds: number[]) => {
             if (cartItemIds.length === 0) {
                   return {
@@ -337,14 +336,14 @@ export const useCartStore = defineStore('cart', () => {
                         cartItems: []
                   };
             }
-
+      
             // 显示加载状态
             showLoadingToast({ message: '计算中...' });
-
+      
             try {
                   // 先同步购物车以确保数据最新
                   await syncCartBeforeCheckout();
-
+      
                   // 调用预览API
                   const res = await previewOrderAmountApi(cartItemIds);
                   closeToast();

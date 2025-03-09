@@ -79,7 +79,7 @@ export interface OrderPreviewResponse {
       promotion: {
             id: number;
             name: string;
-            type: string;
+            type: string;           // 类型: 'AMOUNT_OFF' 或 'PERCENT_OFF'
             thresholdAmount: number;
             discountAmount: number;
       } | null;                     // 适用的促销规则

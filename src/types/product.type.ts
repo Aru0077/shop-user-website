@@ -78,6 +78,13 @@ export interface SpecValue {
 // 商品详情接口
 export interface ProductDetail extends Product {
       specs: Spec[];
+      skus: Sku[];
+      // 添加有效规格组合映射，匹配后端的 validSpecCombinations
+      validSpecCombinations?: Record<string, {
+            skuId: number;
+            stock: number;
+            price: number;
+      }>;
 }
 
 // Banner接口

@@ -256,7 +256,7 @@ export const useProductStore = defineStore('product', () => {
             }
       }
 
-      // 方法: 加载商品详情
+      // 方法: 加载商品详情 
       async function loadProductDetail(id: number) {
             const cacheKey = `${CACHE_KEYS.PRODUCT_DETAIL}${id}`;
 
@@ -270,9 +270,24 @@ export const useProductStore = defineStore('product', () => {
             try {
                   loading.value = true;
                   const res = await getProductDetailApi(id);
-                  currentProduct.value = res.data;
+
+                  // 处理后端返回的数据，确保结构匹配
+                  const productDetail = res.data;
+
+                  // 后端返回的商品详情包括商品基本信息、SKU列表、规格矩阵和有效规格组合映射
+                  currentProduct.value = {
+                        ...productDetail,
+                        // 确保规格矩阵正确处理
+                        specs: productDetail.specs || [],
+                        // 确保SKU列表正确处理
+                        skus: productDetail.skus || [],
+                        // 确保有效规格组合映射正确处理
+                        validSpecCombinations: productDetail.validSpecCombinations || {}
+                  };
+
                   // 存入缓存
-                  storage.set(cacheKey, res.data, CACHE_EXPIRY.PRODUCT_DETAIL);
+                  storage.set(cacheKey, currentProduct.value, CACHE_EXPIRY.PRODUCT_DETAIL);
+
                   return currentProduct.value;
             } catch (error) {
                   console.error('Failed to load product detail:', error);

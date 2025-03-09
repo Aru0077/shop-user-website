@@ -15,13 +15,12 @@ import { AxiosRequestConfig } from 'axios';
  * @param data 添加购物车参数
  */
 export function addToCartApi(data: AddCartItemParams, config?: AxiosRequestConfig) {
-      // 合并配置，确保loading为false
+      // 确保后端接收正确的字段
       return post<ApiResponse<CartItem>>('/cart', data, {
             ...config,
             loading: false
       });
 }
-
 /**
  * 更新购物车商品数量
  * @param id 购物车项ID
@@ -72,4 +71,4 @@ export function clearCartApi() {
  */
 export function previewOrderAmountApi(cartItemIds: number[]) {
       return post<ApiResponse<OrderPreviewResponse>>('/cart/preview', { cartItemIds });
-    }
+}

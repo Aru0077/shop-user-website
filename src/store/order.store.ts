@@ -119,7 +119,7 @@ export const useOrderStore = defineStore('order', () => {
       const res = await createOrderApi(data);
       currentOrder.value = res.data;
 
-      // 添加以下代码，清除订单草稿
+      // 清除订单草稿
       clearOrderDraft();
 
       closeToast();
@@ -211,7 +211,6 @@ export const useOrderStore = defineStore('order', () => {
       return false;
     }
   };
-
   // 清除当前订单
   const clearCurrentOrder = () => {
     currentOrder.value = null;
