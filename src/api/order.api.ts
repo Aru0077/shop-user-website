@@ -44,3 +44,14 @@ export function getOrderDetailApi(id: string) {
 export function payOrderApi(id: string, data: PayOrderParams) {
       return post<ApiResponse<{ orderId: string }>>(`/orders/${id}/pay`, data);
 }
+
+// 在 order.api.ts 中添加
+export function quickBuyOrderApi(data: {
+      addressId: number;
+      productId: number;
+      skuId: number;
+      quantity: number;
+      remark?: string;
+}) {
+      return post<ApiResponse<Order>>('/orders/quick-buy', data);
+}

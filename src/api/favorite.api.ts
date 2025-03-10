@@ -55,9 +55,11 @@ export function getFavoritesApi(params?: {
  * 获取收藏商品ID列表
  */
 export function getFavoriteIdsApi() {
-    return get<ApiResponse<FavoriteIdsResponse>>('/favorites', { idsOnly: true });
+    return get<ApiResponse<{
+        total: number;
+        data: number[];
+    }>>('/favorites', { idsOnly: true });
 }
-
 /**
  * 检查商品是否已收藏
  * 此方法在前端实现，基于已加载的收藏ID列表

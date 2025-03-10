@@ -5,7 +5,8 @@ import {
   createOrderApi,
   getOrderListApi,
   getOrderDetailApi,
-  payOrderApi
+  payOrderApi,
+  quickBuyOrderApi
 } from '@/api/order.api';
 import { Order, OrderStatus, CreateOrderParams, PayOrderParams } from '@/types/order.type';
 import { CartItem } from '@/types/cart.type';
@@ -104,6 +105,42 @@ export const useOrderStore = defineStore('order', () => {
     }
   };
 
+  // 快速购买创建订单
+  const createOrderFromQuickBuy = async (
+    addressId: number,
+    productId: number,
+    skuId: number,
+    quantity: number,
+    remark: string = ''
+  ) => {
+    const userStore = useUserStore();
+    if (!userStore.isLoggedIn) return null;
+
+    showLoadingToast({
+      message: '提交订单中...',
+      forbidClick: true,
+    });
+
+    try {
+      const res = await quickBuyOrderApi({
+        addressId,
+        productId,
+        skuId,
+        quantity,
+        remark
+      });
+
+      currentOrder.value = res.data;
+
+      closeToast();
+      showNotify({ type: 'success', message: '订单创建成功' });
+      return res.data;
+    } catch (error) {
+      closeToast();
+      console.error('快速购买创建订单失败:', error);
+      return null;
+    }
+  };
 
   // 创建订单 
   const createOrder = async (data: CreateOrderParams) => {
@@ -211,6 +248,7 @@ export const useOrderStore = defineStore('order', () => {
       return false;
     }
   };
+
   // 清除当前订单
   const clearCurrentOrder = () => {
     currentOrder.value = null;

@@ -48,28 +48,16 @@ export const useFavoriteStore = defineStore('favorite', () => {
       };
 
       // 加载收藏ID列表
+      // 在 favorite.store.ts 中
       const loadFavoriteIds = async (force = false) => {
             // 如果非强制刷新且已有数据，直接返回
             if (!force && favoriteIds.value.length > 0) {
                   return favoriteIds.value;
             }
 
-            // 尝试从缓存获取
-            if (!force) {
-                  const cachedIds = storage.get(CACHE_KEYS.FAVORITE_IDS);
-                  if (cachedIds && cachedIds.length >= 0) {
-                        favoriteIds.value = cachedIds;
-                        return cachedIds;
-                  }
-            }
-
             try {
                   const res = await getFavoriteIdsApi();
                   favoriteIds.value = res.data.data;
-
-                  // 存入缓存
-                  storage.set(CACHE_KEYS.FAVORITE_IDS, res.data.data, CACHE_EXPIRY.FAVORITE_IDS);
-
                   return res.data.data;
             } catch (error) {
                   console.error('获取收藏ID列表失败:', error);

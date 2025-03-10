@@ -52,7 +52,7 @@ export const PaymentStatusText = {
 
 /**
  * 订单接口
- */ 
+ */
 export interface Order {
       id: string;
       orderNo: string;
@@ -81,7 +81,7 @@ export interface Order {
       updatedAt: string;
       orderItems: OrderItem[];
       paymentLogs?: PaymentLog[];
-      timeoutSeconds?: number | null; // 添加倒计时字段，匹配后端返回
+      timeoutSeconds?: number | null; // 订单超时倒计时，后端会返回
 }
 
 /**

@@ -96,7 +96,12 @@ export interface OrderPreviewResponse {
  * 预览订单请求参数
  */
 export interface PreviewOrderParams {
-      cartItemIds: number[];
+      cartItemIds?: number[];
+      productInfo?: {
+            productId: number;
+            skuId: number;
+            quantity: number;
+      };
 }
 
 

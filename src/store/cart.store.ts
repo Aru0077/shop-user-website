@@ -326,6 +326,7 @@ export const useCartStore = defineStore('cart', () => {
       };
 
       // 在结算前预览订单金额（包含满减优惠） 
+      // 在结算前预览订单金额（包含满减优惠） 
       const previewOrderAmount = async (cartItemIds: number[]) => {
             if (cartItemIds.length === 0) {
                   return {
@@ -333,19 +334,19 @@ export const useCartStore = defineStore('cart', () => {
                         discountAmount: 0,
                         paymentAmount: 0,
                         promotion: null,
-                        cartItems: []
+                        items: []
                   };
             }
-      
+
             // 显示加载状态
             showLoadingToast({ message: '计算中...' });
-      
+
             try {
                   // 先同步购物车以确保数据最新
                   await syncCartBeforeCheckout();
-      
+
                   // 调用预览API
-                  const res = await previewOrderAmountApi(cartItemIds);
+                  const res = await previewOrderAmountApi({ cartItemIds });
                   closeToast();
                   return res.data;
             } catch (error) {
@@ -356,6 +357,25 @@ export const useCartStore = defineStore('cart', () => {
             }
       };
 
+      // 为快速购买添加新方法
+      const previewDirectOrderAmount = async (productInfo: {
+            productId: number;
+            skuId: number;
+            quantity: number;
+      }) => {
+            showLoadingToast({ message: '计算中...' });
+
+            try {
+                  const res = await previewOrderAmountApi({ productInfo });
+                  closeToast();
+                  return res.data;
+            } catch (error) {
+                  closeToast();
+                  console.error('获取直接购买预览失败:', error);
+                  showNotify({ type: 'warning', message: '计算订单金额失败' });
+                  return null;
+            }
+      };
 
       return {
             // 状态
@@ -382,7 +402,8 @@ export const useCartStore = defineStore('cart', () => {
             clearAllCart,
             resetCart,
             syncCartItem,
-            previewOrderAmount
+            previewOrderAmount,
+            previewDirectOrderAmount
       };
 }, {
       persist: true // 添加持久化配置

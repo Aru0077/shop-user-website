@@ -67,8 +67,14 @@ export function clearCartApi() {
 
 /**
  * 预览订单金额（包含满减优惠）
- * @param cartItemIds 购物车项ID数组
  */
-export function previewOrderAmountApi(cartItemIds: number[]) {
-      return post<ApiResponse<OrderPreviewResponse>>('/cart/preview', { cartItemIds });
+export function previewOrderAmountApi(params: {
+      cartItemIds?: number[];
+      productInfo?: {
+            productId: number;
+            skuId: number;
+            quantity: number;
+      };
+}) {
+      return post<ApiResponse<OrderPreviewResponse>>('/cart/preview', params);
 }
