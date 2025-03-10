@@ -207,7 +207,7 @@ const routes: Array<RouteRecordRaw> = [
             name: 'Privacy',
             component: () => import('@/views/legal/Privacy.vue'),
             meta: {
-                  title: 'UniMall - Privacy',
+                  title: 'UniMall - Privacy', 
                   navBar: {
                         show: true,
                         leftBtn: 'back',
@@ -223,7 +223,7 @@ const routes: Array<RouteRecordRaw> = [
             name: 'Terms',
             component: () => import('@/views/legal/Terms.vue'),
             meta: {
-                  title: 'UniMall - Terms',
+                  title: 'UniMall - Terms', 
                   navBar: {
                         show: true,
                         leftBtn: 'back',

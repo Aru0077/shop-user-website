@@ -1,146 +1,173 @@
-<!--  App.vue -->
+<!-- src/App.vue -->
 <template>
-  <div id="app" class="w-screen h-screen overflow-hidden flex flex-col">
-    <!-- 顶部导航栏 - 固定高度 -->
-    <div class="w-full z-20 flex-shrink-0">
-      <nav-bar v-if="navBarConfig.show" :left-btn="navBarConfig.leftBtn" :right-btn="navBarConfig.rightBtn"
-        :show-background="navBarConfig.showBackground" />
+  <div class="app-container">
+    <!-- 离线模式提示条 -->
+    <div v-if="offlineMode" class="offline-bar">
+      <van-icon name="warning-o" />
+      <span>当前处于离线模式，部分功能可能受限</span>
+      <van-button v-if="isOnline" size="mini" type="primary" @click="syncOfflineData">
+        同步数据
+      </van-button>
     </div>
-
-    <!-- 中间内容区域 - 可滚动，占据剩余空间 -->
-    <div class="flex-1 overflow-auto relative">
-      <router-view v-slot="{ Component }">
-        <keep-alive :include="['Home', 'Category', 'Cart', 'User']">
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
-    </div>
-
-    <!-- 底部TabBar - 固定高度 -->
-    <div v-if="showTabBar" class="w-full flex-shrink-0 z-20">
-      <CustomTabBar />
-    </div>
+    
+    <!-- 应用内容 -->
+    <router-view />
+    
+    <!-- 全局加载指示器 -->
+    <van-overlay :show="globalLoading" z-index="9999">
+      <div class="global-loading">
+        <van-loading type="spinner" color="#1989fa" size="36px" />
+        <p>加载中...</p>
+      </div>
+    </van-overlay>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { onMounted, onBeforeUnmount, computed, ref } from "vue";
-import { useRoute } from "vue-router";
-import { useWindowSize } from "@/hooks/useWindowSize";
-import NavBar from "./components/common/NavBar.vue";
-import CustomTabBar from "./components/common/CustomTabBar.vue";
-import { getOptimizationLevel, isFacebookBrowser } from "@/utils/browser";
+<script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { Overlay, Loading, Icon, Button, showNotify } from 'vant';
+import networkService from '@/utils/networkService';
+import useDataAccess from '@/composables/useDataAccess';
+import { useUserStore } from '@/store/user.store';
+import appInitializer from '@/utils/appInitializer';
 
-// 优化级别
-const optimizationLevel = ref(getOptimizationLevel());
-const isFB = ref(isFacebookBrowser());
+// 引入组件
+const VanOverlay = Overlay;
+const VanLoading = Loading;
+const VanIcon = Icon;
+const VanButton = Button;
 
-// 监听窗口大小变化，用于响应式设计
-const { width } = useWindowSize();
-const route = useRoute();
+// 路由实例
+const router = useRouter();
 
-// 监听网络状态变化
-const handleNetworkChange = () => {
-  if (!navigator.onLine) {
-    // 网络离线处理
-    console.log("网络已断开");
-  } else {
-    // 网络恢复处理
-    console.log("网络已连接");
+// 数据访问API
+const dataAccess = useDataAccess();
+
+// 用户存储
+const userStore = useUserStore();
+
+// 全局加载状态
+const globalLoading = ref(false);
+
+// 网络状态
+const isOnline = computed(() => networkService.isOnline.value);
+
+// 离线模式状态
+const offlineMode = computed(() => 
+  dataAccess.cartStore.offlineMode || 
+  dataAccess.favoriteStore.offlineMode || 
+  dataAccess.productStore.offlineMode
+);
+
+// 监听数据同步状态变化
+watch([
+  () => dataAccess.cartStore.hasOfflineChanges,
+  () => dataAccess.favoriteStore.hasOfflineChanges
+], () => {
+  // 检查是否有未同步的数据
+  const hasOfflineChanges = 
+    dataAccess.cartStore.hasOfflineChanges || 
+    dataAccess.favoriteStore.hasOfflineChanges;
+  
+  // 如果有未同步的数据且网络已恢复，提示用户同步
+  if (hasOfflineChanges && isOnline.value) {
+    showNotify({ 
+      type: 'primary', 
+      message: '检测到未同步的本地更改，点击顶部横幅进行同步' 
+    });
+  }
+});
+
+// 同步离线数据
+const syncOfflineData = async () => {
+  if (!isOnline.value) {
+    showNotify({ 
+      type: 'warning', 
+      message: '网络连接不可用，请稍后再试' 
+    });
+    return;
+  }
+  
+  globalLoading.value = true;
+  
+  try {
+    // 使用统一数据访问API同步数据
+    const success = await dataAccess.syncAllOfflineData();
+    
+    if (success) {
+      showNotify({ 
+        type: 'success', 
+        message: '数据同步成功' 
+      });
+    }
+  } catch (error) {
+    console.error('同步离线数据失败:', error);
+    showNotify({ 
+      type: 'danger', 
+      message: '数据同步失败，请稍后再试' 
+    });
+  } finally {
+    globalLoading.value = false;
   }
 };
 
-// 获取当前路由的导航栏配置
-const navBarConfig = computed(() => {
-  const defaultConfig = {
-    show: false,
-    leftBtn: "back",
-    rightBtn: "none",
-    showBackground: false,
-  };
-
-  return {
-    ...defaultConfig,
-    ...(route.meta.navBar || {}),
-  };
+// 监听路由变化
+router.beforeEach((to, from, next) => {
+  // 需要登录的路由
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  
+  if (requiresAuth && !userStore.isLoggedIn) {
+    next('/login');
+  } else {
+    next();
+  }
 });
 
-// 获取当前路由的TabBar显示状态
-const showTabBar = computed(() => {
-  return route.meta.tabBar?.show ?? false;
-});
-
+// 挂载时
 onMounted(() => {
-  // 添加网络状态监听
-  window.addEventListener("online", handleNetworkChange);
-  window.addEventListener("offline", handleNetworkChange);
-
-  // 禁用浏览器默认的下拉刷新行为
-  document.body.addEventListener(
-    "touchmove",
-    (e) => {
-      if (e.touches.length > 1) {
-        e.preventDefault();
-      }
-    },
-    { passive: false },
-  );
-
-  // 为Facebook浏览器添加特殊类
-  if (isFB.value) {
-    document.body.classList.add('fb-webview');
-  }
-
-  // 针对高优化级别减少动画
-  if (optimizationLevel.value === 'high') {
-    document.body.classList.add('reduce-animations');
-  }
-
-  const setupPerformanceOptimizations = () => {
-    // 获取优化级别
-    if (optimizationLevel.value === 'high') {
-      // 针对高优化（低性能设备）完全禁用过渡动画
-      document.body.classList.add('disable-animations');
-    } else if (optimizationLevel.value === 'medium') {
-      // 针对中等优化级别减少动画时间
-      document.body.classList.add('reduce-animations');
-    }
-  };
-
-  // 调用此函数
-  setupPerformanceOptimizations();
-
-});
-
-onBeforeUnmount(() => {
-  // 移除网络状态监听
-  window.removeEventListener("online", handleNetworkChange);
-  window.removeEventListener("offline", handleNetworkChange);
+  // 初始化应用
+  // main.ts中已处理初始化，这里只是为了确保组件特定的初始化
+  
+  // 检查网络状态
+  networkService.checkNetworkStatus();
 });
 </script>
 
-
-<style>
-.fb-webview .fade-enter-active,
-.fb-webview .fade-leave-active,
-.fb-webview .slide-right-enter-active,
-.fb-webview .slide-right-leave-active,
-.reduce-animations .fade-enter-active,
-.reduce-animations .fade-leave-active,
-.reduce-animations .slide-right-enter-active,
-.reduce-animations .slide-right-leave-active {
-  transition: all 0.15s linear;
+<style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.disable-animations .fade-enter-active,
-.disable-animations .fade-leave-active,
-.disable-animations .slide-right-enter-active,
-.disable-animations .slide-right-leave-active {
-  transition: none !important;
+.offline-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background-color: #fffbe8;
+  color: #ed6a0c;
+  font-size: 14px;
+  border-bottom: 1px solid #ffe58f;
 }
 
-.disable-animations .icon-wrapper,
-.disable-animations .icon-wrapper::after {
-  transition: none !important;
+.offline-bar span {
+  flex: 1;
+  margin: 0 12px;
+}
+
+.global-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: white;
+}
+
+.global-loading p {
+  margin-top: 12px;
+  font-size: 14px;
 }
 </style>
