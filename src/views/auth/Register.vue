@@ -76,7 +76,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { showNotify, showDialog } from 'vant';
 import UniMallLogo from '@/assets/images/unimall.png'
-import { register } from '@/api/user.api';
+import { registerApi } from '@/api/user.api';
 
 // 表单数据 
 const formData = ref({
@@ -130,7 +130,7 @@ const handleEmailSignup = async () => {
             isLoading.value = true;
 
             // 调用注册API，仅传递后端需要的字段
-            await register({
+            await registerApi({
                   username: formData.value.username,
                   password: formData.value.password
             });
